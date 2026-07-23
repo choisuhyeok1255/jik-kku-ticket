@@ -1,34 +1,56 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TEAMS, useMyTeam } from "@/entities/team";
+import { toast } from "sonner";
+import { TEAMS, TEAM_LIST, useMyTeam } from "@/entities/team";
+import { VendorKey } from "@/shared/config/vendor-keys";
 import { ServerClock, type ClockSource } from "@/features/server-time";
-import { Onboarding, TeamPicker } from "@/features/pick-team";
+import { TeamPicker, TeamOnboardingModal } from "@/features/pick-team";
 import { TeamCalendar } from "@/widgets/team-calendar";
 
 /**
  * 메인 화면.
- * - 응원 팀(localStorage)이 없으면 온보딩을, 있으면 개인화 화면을 보여준다.
- * - 개인화 화면 = [서버시계 | 팀 선택 좌우 2단] + [팀 월간 캘린더].
- * - 팀 변경은 별도 화면 없이 서버시계 옆 팀 선택 그리드에서 즉시 이뤄진다.
- * - 내 팀이 정해지면 시계 초기 탭이 그 팀 첫 홈 예매처로 세팅된다.
- * - 캘린더 경기 셀의 예매처 링크로 각 예매 사이트에 바로 이동한다.
+ * - 진입하면 바로 캘린더를 보여준다(응원팀 설정은 선택사항).
+ * - 첫 방문(팀 미설정 & 온보딩 미열람)이면 딤 모달로 팀 선택을 유도한다.
+ *   고르면 기본 응원팀으로 저장 + 토스트 안내, 스킵하면 미설정으로 둘러본다.
+ * - 미설정 상태: 캘린더는 첫 번째 팀 기준으로 보인다.
+ * - 시계 기본값은 표준시. 캘린더 예매처 버튼을 누르면 그 예매처 서버시간으로 전환된다.
  */
 
 export default function HomePage() {
-  const { team, loaded, setTeam } = useMyTeam();
+  const { team, loaded, hasSeenOnboarding, setTeam, markOnboardingSeen } =
+    useMyTeam();
   const [activeSource, setActiveSource] = useState<ClockSource>("standard");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 내 팀이 정해지면 시계 초기 탭을 그 팀 첫 홈 예매처로 맞춘다
+  // 첫 방문(팀 미설정 & 온보딩 미열람)이면 팀 선택 모달을 연다
   useEffect(() => {
-    const initClockToHomeVendor = () => {
-      if (team) setActiveSource(TEAMS[team].vendors[0].key);
+    const openModalOnFirstVisit = () => {
+      if (loaded && !team && !hasSeenOnboarding) setIsModalOpen(true);
     };
-    initClockToHomeVendor();
-  }, [team]);
+    openModalOnFirstVisit();
+  }, [loaded, team, hasSeenOnboarding]);
 
   const handleSourceChange = (source: ClockSource) => setActiveSource(source);
+
+  // 캘린더 예매처 버튼 → 그 예매처 서버시간으로 시계 전환
+  const handlePickVendor = (vendor: VendorKey) => setActiveSource(vendor);
+
+  // 오른쪽 그리드에서의 팀 변경 (조용히 반영)
   const handlePickTeam = (teamId: string) => setTeam(teamId);
+
+  // 모달에서의 팀 선택 (기본 응원팀 설정 + 토스트 안내)
+  const handlePickTeamFromModal = (teamId: string) => {
+    setTeam(teamId);
+    markOnboardingSeen();
+    setIsModalOpen(false);
+    toast.success(`${TEAMS[teamId].name}을 기본 응원팀으로 설정했어요`);
+  };
+
+  const handleSkipModal = () => {
+    markOnboardingSeen();
+    setIsModalOpen(false);
+  };
 
   if (!loaded) {
     return (
@@ -38,9 +60,8 @@ export default function HomePage() {
     );
   }
 
-  if (!team) {
-    return <Onboarding onPick={handlePickTeam} />;
-  }
+  const displayTeamId = team ?? TEAM_LIST[0].id; // 미설정이면 첫 팀 기준으로 표시
+  const isUnset = !team;
 
   return (
     <main className="wrap">
@@ -49,10 +70,24 @@ export default function HomePage() {
           activeSource={activeSource}
           onSourceChange={handleSourceChange}
         />
-        <TeamPicker currentTeam={team} onPick={handlePickTeam} />
+        <TeamPicker currentTeam={team ?? ""} onPick={handlePickTeam} />
       </div>
 
-      <TeamCalendar teamId={team} />
+      {isUnset && (
+        <p className="unset-hint">
+          응원팀 미설정 · <b>{TEAMS[displayTeamId].name}</b> 기준으로 보고 있어요.
+          오른쪽에서 팀을 고르면 기본 응원팀이 됩니다.
+        </p>
+      )}
+
+      <TeamCalendar teamId={displayTeamId} onPickVendor={handlePickVendor} />
+
+      {isModalOpen && (
+        <TeamOnboardingModal
+          onPick={handlePickTeamFromModal}
+          onSkip={handleSkipModal}
+        />
+      )}
     </main>
   );
 }
