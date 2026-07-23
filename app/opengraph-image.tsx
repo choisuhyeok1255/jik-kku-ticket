@@ -7,7 +7,7 @@ import { ImageResponse } from "next/og";
  * - 앱 다크 테마 색을 반영한 서버시계 모티프.
  */
 
-export const alt = "직꾸 티켓 · KBO 예매 서버시계";
+export const alt = "KBO 예매 서버시계 | 직꾸 티켓";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -48,8 +48,8 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0d0f14",
-          color: "#eef1f6",
+          background: "#0a0a0a",
+          color: "#ffffff",
           fontFamily: "NotoSansKR, sans-serif",
         }}
       >
@@ -79,7 +79,7 @@ export default async function Image() {
             display: "flex",
             fontSize: 72,
             fontWeight: 700,
-            color: "#4f8cff",
+            color: "#c6e900",
             marginTop: 14,
             letterSpacing: 2,
           }}

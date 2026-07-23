@@ -1,11 +1,14 @@
 :root {
-  --bg: #0d0f14;
-  --panel: #161a22;
-  --panel-2: #1d222c;
-  --line: #2a303c;
-  --text: #eef1f6;
-  --muted: #99a2b2;
-  --accent: #4f8cff;
+  /* victory 톤: 거의 검은 다크 배경 + 반투명 흰색 표면, 보라 primary·라임 보조 */
+  --bg: #0a0a0a;
+  --panel: rgba(255, 255, 255, 0.05);
+  --panel-2: rgba(255, 255, 255, 0.09);
+  --line: rgba(255, 255, 255, 0.1);
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.78);
+  --accent: #5724f0;
+  --accent-2: #c6e900;
+  --surface-deep: #0a0a0a;
 }
 
 * {
@@ -18,8 +21,8 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
-    "Malgun Gothic", "Noto Sans KR", Roboto, sans-serif;
+  font-family: var(--font-laundry), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -86,7 +89,7 @@ a {
 .clock {
   margin: 20px 0;
   padding: 18px;
-  background: #0a0c11;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   text-align: center;
@@ -134,7 +137,7 @@ a {
 }
 .clock-time .ms {
   font-size: 20px;
-  color: var(--accent);
+  color: var(--text);
   margin-left: 2px;
   min-width: 34px;
   text-align: left;
@@ -161,7 +164,7 @@ a {
   font-size: 13px;
   color: var(--muted);
   padding: 8px 12px;
-  background: #0a0c11;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
 }
@@ -247,7 +250,7 @@ a {
 }
 .g-vendor {
   color: var(--text);
-  background: #0a0c11;
+  background: var(--panel);
   border: 1px solid var(--line);
   padding: 2px 8px;
   border-radius: 999px;
@@ -385,40 +388,53 @@ a {
 .cal-cell.has-game {
   border-color: var(--muted);
 }
-.cal-opp {
-  font-size: 12px;
-  font-weight: 700;
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  line-height: 1.2;
+.cal-flag {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.4;
 }
-.opp-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  flex-shrink: 0;
+.cal-flag.home {
+  color: #fff;
+}
+.cal-flag.away {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--muted);
+}
+.cal-opp-big {
+  margin: auto 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
 }
 .cal-books {
   display: flex;
   flex-wrap: wrap;
   gap: 3px;
-  margin-top: 3px;
+  margin-top: auto;
 }
 .cal-book-link {
   font-size: 9px;
   line-height: 1.5;
   padding: 1px 4px;
   border-radius: 6px;
-  background: #0a0c11;
-  border: 1px solid var(--line);
-  color: var(--text);
+  background: rgba(198, 233, 0, 0.14);
+  border: 1px solid rgba(198, 233, 0, 0.32);
+  color: var(--accent-2);
   white-space: nowrap;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
 }
 .cal-book-link:hover {
-  border-color: var(--accent);
+  background: rgba(198, 233, 0, 0.24);
+  border-color: var(--accent-2);
 }
 .cal-empty {
   text-align: center;
@@ -427,82 +443,103 @@ a {
   padding: 20px 0;
 }
 
-/* ---------- onboarding ---------- */
-.onb {
-  min-height: 100vh;
+/* ---------- 미설정 안내 배지 ---------- */
+.unset-hint {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.unset-hint b {
+  color: var(--text);
+}
+
+/* ---------- 팀 선택 딤 모달 ---------- */
+.modal-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.66);
+  backdrop-filter: blur(2px);
+}
+.modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
   padding: 24px;
 }
-.onb-inner {
-  max-width: 560px;
-  width: 100%;
-}
-.onb-eyebrow {
+.modal-eyebrow {
   font-size: 13px;
   color: var(--accent);
   font-weight: 700;
   margin: 0 0 8px;
 }
-.onb-title {
-  font-size: 26px;
+.modal-title {
+  font-size: 22px;
   margin: 0 0 10px;
   letter-spacing: -0.5px;
 }
-.onb-sub {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0 0 24px;
-}
-.onb-sub b {
-  color: var(--text);
-}
-.onb-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-}
-.onb-team {
-  text-align: left;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--team, var(--line));
-  border-radius: 10px;
-  padding: 12px 14px;
-  cursor: pointer;
-  color: var(--text);
-  font-family: inherit;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  transition: background 0.12s ease, box-shadow 0.12s ease;
-}
-.onb-team:hover {
-  background: var(--panel-2);
-}
-.onb-team.on {
-  box-shadow: 0 0 0 1px var(--team, var(--accent));
-  background: var(--panel-2);
-}
-.onb-team-name {
-  font-size: 15px;
-  font-weight: 700;
-}
-.onb-team-vendor {
-  font-size: 11px;
-  color: var(--muted);
-}
-.onb-cancel {
-  margin-top: 16px;
-  background: none;
-  border: none;
+.modal-sub {
   color: var(--muted);
   font-size: 13px;
-  cursor: pointer;
-  text-decoration: underline;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+.modal-sub b {
+  color: var(--text);
+}
+.modal-team-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.modal-team-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--team, var(--line));
+  border-radius: 8px;
+  color: var(--text);
   font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+.modal-team-cell:hover {
+  background: var(--line);
+  box-shadow: 0 0 0 1px var(--team, var(--accent));
+}
+.modal-skip {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 11px;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+.modal-skip:hover {
+  color: var(--text);
+  border-color: var(--muted);
 }
 
 /* ---------- clock + team picker row (좌우 2단) ---------- */
@@ -527,7 +564,7 @@ a {
 .team-picker {
   flex: 1 1 0;
   min-width: 0;
-  background: #0a0c11;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 14px;
@@ -565,27 +602,48 @@ a {
   background: var(--panel-2);
 }
 
-@media (max-width: 480px) {
-  .games {
-    grid-template-columns: 1fr;
-  }
+/* 태블릿·큰 폰: 시계 | 팀선택 좌우 2단을 세로로 쌓아 짓눌림 방지 */
+@media (max-width: 640px) {
   .clock-row {
     flex-direction: column;
   }
-  .clock-row .clock-time {
-    font-size: 38px;
-  }
+  .clock-row .clock-time,
   .clock-time {
-    font-size: 38px;
+    font-size: 40px;
+  }
+  .clock-row .clock-time .ms {
+    font-size: 20px;
+    min-width: 34px;
+  }
+}
+
+/* 모바일: 좁은 7열 캘린더 셀 정보가 넘치지 않게 */
+@media (max-width: 480px) {
+  .games {
+    grid-template-columns: 1fr;
   }
   .cal-grid,
   .cal-dow {
     gap: 4px;
   }
-  .cal-opp {
+  .cal-cell {
+    aspect-ratio: auto;
+    min-height: 66px;
+    padding: 3px;
+    overflow: hidden;
+  }
+  .cal-day {
     font-size: 10px;
   }
-  .cal-cell {
-    padding: 3px;
+  .cal-flag {
+    font-size: 7px;
+    padding: 0 4px;
+  }
+  .cal-opp-big {
+    font-size: 15px;
+  }
+  .cal-book-link {
+    font-size: 8px;
+    padding: 1px 3px;
   }
 }

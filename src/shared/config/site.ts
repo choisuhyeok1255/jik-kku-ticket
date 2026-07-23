@@ -9,7 +9,8 @@ export const SITE_URL =
 
 export const SITE_NAME = "직꾸 티켓";
 
-export const SITE_TITLE = "직꾸 티켓 · KBO 예매 서버시계";
+// victory(직꾸) 본체의 title 규칙(`설명 | 직꾸`)에 맞춰, 서브도메인 접미사 `직꾸 티켓`을 뒤에 둔다.
+export const SITE_TITLE = "KBO 예매 서버시계 | 직꾸 티켓";
 
 export const SITE_DESCRIPTION =
   "KBO 구단별 예매처 바로가기와 예매처 서버시간을 한 화면에서. 예매창 따로, 시계 사이트 따로 띄울 필요 없이 초 단위로 티켓 오픈을 준비하세요.";

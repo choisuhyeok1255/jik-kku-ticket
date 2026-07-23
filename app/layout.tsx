@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "@/app/styles/globals.css";
 import Providers from "@/app/providers";
 import {
@@ -9,11 +10,21 @@ import {
   SITE_KEYWORDS,
 } from "@/shared/config/site";
 
+// victory와 톤을 맞춘 LaundryGothic(런드리고딕) 본문 폰트
+const laundryGothic = localFont({
+  src: [
+    { path: "../public/fonts/LaundryGothic-Regular.woff", weight: "400" },
+    { path: "../public/fonts/LaundryGothic-Bold.woff", weight: "700" },
+  ],
+  variable: "--font-laundry",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: `%s · ${SITE_NAME}`,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
@@ -50,7 +61,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0f14",
+  themeColor: "#0a0a0a",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -80,7 +91,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
+      <body className={laundryGothic.variable}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
