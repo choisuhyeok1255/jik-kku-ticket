@@ -443,21 +443,6 @@ a {
   padding: 20px 0;
 }
 
-/* ---------- 미설정 안내 배지 ---------- */
-.unset-hint {
-  margin: 4px 0 0;
-  padding: 10px 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.5;
-}
-.unset-hint b {
-  color: var(--text);
-}
-
 /* ---------- 팀 선택 딤 모달 ---------- */
 .modal-dim {
   position: fixed;
@@ -473,7 +458,8 @@ a {
 .modal-card {
   width: 100%;
   max-width: 440px;
-  background: var(--panel);
+  /* 딤 위에 뜨므로 반투명 표면이 아니라 불투명 다크 카드색을 쓴다 */
+  background: #1c1c1c;
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 24px;
@@ -510,7 +496,6 @@ a {
   padding: 10px 4px;
   background: var(--panel-2);
   border: 1px solid var(--line);
-  border-left: 3px solid var(--team, var(--line));
   border-radius: 8px;
   color: var(--text);
   font-family: inherit;
@@ -522,6 +507,11 @@ a {
 .modal-team-cell:hover {
   background: var(--line);
   box-shadow: 0 0 0 1px var(--team, var(--accent));
+}
+.modal-team-cell.on {
+  border-color: var(--team, var(--accent));
+  box-shadow: 0 0 0 1px var(--team, var(--accent));
+  background: var(--line);
 }
 .modal-skip {
   display: block;
@@ -595,85 +585,72 @@ a {
   background: rgba(198, 233, 0, 0.2);
 }
 
-/* ---------- clock + team picker row (좌우 2단) ---------- */
-.clock-row {
+/* ---------- 팀 바 (현재 응원팀 + 변경 버튼) ---------- */
+.team-bar {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  margin: 20px 0;
-  align-items: stretch;
-}
-.clock-row .clock {
-  margin: 0;
-  flex: 1 1 0;
-  min-width: 0;
-}
-.clock-row .clock-time {
-  font-size: 28px;
-}
-.clock-row .clock-time .ms {
-  font-size: 15px;
-  min-width: 26px;
-}
-.team-picker {
-  flex: 1 1 0;
-  min-width: 0;
+  margin-top: 18px;
+  padding: 12px 14px;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
 }
-.team-picker-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-auto-rows: 1fr;
-  gap: 6px;
-}
-.team-picker-cell {
+.team-bar-info {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 4px;
-  cursor: pointer;
-  color: var(--text);
-  font-family: inherit;
+  gap: 8px;
+  min-width: 0;
+}
+.team-bar-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+.team-bar-name {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.team-bar-vendor {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.team-bar-change {
+  flex-shrink: 0;
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.12s ease, box-shadow 0.12s ease;
-}
-.team-picker-cell:hover {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
   background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease;
 }
-.team-picker-cell.on {
-  border-color: var(--team, var(--accent));
-  box-shadow: 0 0 0 1px var(--team, var(--accent));
-  background: var(--panel-2);
+.team-bar-change:hover {
+  background: var(--line);
+  border-color: var(--muted);
 }
 
-/* 태블릿·큰 폰: 시계 | 팀선택 좌우 2단을 세로로 쌓아 짓눌림 방지 */
-@media (max-width: 640px) {
-  .clock-row {
-    flex-direction: column;
-  }
-  .clock-row .clock-time,
-  .clock-time {
-    font-size: 40px;
-  }
-  .clock-row .clock-time .ms {
-    font-size: 20px;
-    min-width: 34px;
-  }
-}
-
-/* 모바일: 좁은 7열 캘린더 셀 정보가 넘치지 않게 */
+/* 모바일: 시계 폰트 축소 + 좁은 7열 캘린더 셀 정보가 넘치지 않게 */
 @media (max-width: 480px) {
   .games {
     grid-template-columns: 1fr;
+  }
+  .clock-time {
+    font-size: 34px;
+  }
+  .clock-time .ms {
+    font-size: 16px;
+    min-width: 28px;
   }
   .cal-grid,
   .cal-dow {

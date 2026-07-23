@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { TEAMS, TEAM_LIST, useMyTeam } from "@/entities/team";
+import { VENDORS } from "@/entities/vendor";
 import { VendorKey } from "@/shared/config/vendor-keys";
 import { ServerClock, type ClockSource } from "@/features/server-time";
-import { TeamPicker, TeamOnboardingModal } from "@/features/pick-team";
+import { TeamOnboardingModal } from "@/features/pick-team";
 import { TeamCalendar } from "@/widgets/team-calendar";
 import { SiteHeader } from "@/widgets/site-header";
 
@@ -13,9 +14,8 @@ import { SiteHeader } from "@/widgets/site-header";
  * 메인 화면.
  * - 진입하면 바로 캘린더를 보여준다(응원팀 설정은 선택사항).
  * - 첫 방문(팀 미설정 & 온보딩 미열람)이면 딤 모달로 팀 선택을 유도한다.
- *   고르면 기본 응원팀으로 저장 + 토스트 안내, 스킵하면 미설정으로 둘러본다.
- * - 미설정 상태: 캘린더는 첫 번째 팀 기준으로 보인다.
- * - 시계 기본값은 표준시. 캘린더 예매처 버튼을 누르면 그 예매처 서버시간으로 전환된다.
+ * - 상단 팀 바에 현재 응원팀과 "팀 변경" 버튼을 두고, 변경 시 같은 모달을 재사용한다.
+ * - 서버시계는 전폭으로 크게, 시계 기본값은 표준시. 캘린더 예매처 버튼으로 예매처 시계로 전환.
  */
 
 export default function HomePage() {
@@ -33,14 +33,9 @@ export default function HomePage() {
   }, [loaded, team, hasSeenOnboarding]);
 
   const handleSourceChange = (source: ClockSource) => setActiveSource(source);
-
-  // 캘린더 예매처 버튼 → 그 예매처 서버시간으로 시계 전환
   const handlePickVendor = (vendor: VendorKey) => setActiveSource(vendor);
 
-  // 오른쪽 그리드에서의 팀 변경 (조용히 반영)
-  const handlePickTeam = (teamId: string) => setTeam(teamId);
-
-  // 모달에서의 팀 선택 (기본 응원팀 설정 + 토스트 안내)
+  // 모달에서 팀 선택/변경 (기본 응원팀 설정 + 토스트)
   const handlePickTeamFromModal = (teamId: string) => {
     setTeam(teamId);
     markOnboardingSeen();
@@ -48,7 +43,7 @@ export default function HomePage() {
     toast.success(`${TEAMS[teamId].name}을 기본 응원팀으로 설정했어요`);
   };
 
-  const handleSkipModal = () => {
+  const handleCloseModal = () => {
     markOnboardingSeen();
     setIsModalOpen(false);
   };
@@ -63,32 +58,47 @@ export default function HomePage() {
 
   const displayTeamId = team ?? TEAM_LIST[0].id; // 미설정이면 첫 팀 기준으로 표시
   const isUnset = !team;
+  const displayTeam = TEAMS[displayTeamId];
+  const homeVendor = VENDORS[displayTeam.vendors[0].key];
 
   return (
     <main className="wrap">
       <SiteHeader />
 
-      <div className="clock-row">
-        <ServerClock
-          activeSource={activeSource}
-          onSourceChange={handleSourceChange}
-        />
-        <TeamPicker currentTeam={team ?? ""} onPick={handlePickTeam} />
+      <div className="team-bar">
+        <div className="team-bar-info">
+          <span
+            className="team-bar-dot"
+            style={{ background: displayTeam.color }}
+          />
+          <span className="team-bar-name">
+            {isUnset ? "응원팀 미설정" : displayTeam.name}
+          </span>
+          <span className="team-bar-vendor">
+            {isUnset ? `${displayTeam.name} 기준` : `예매 ${homeVendor.shortName}`}
+          </span>
+        </div>
+        <button
+          type="button"
+          className="team-bar-change"
+          onClick={() => setIsModalOpen(true)}
+        >
+          {isUnset ? "응원팀 선택" : "팀 변경"}
+        </button>
       </div>
 
-      {isUnset && (
-        <p className="unset-hint">
-          응원팀 미설정 · <b>{TEAMS[displayTeamId].name}</b> 기준으로 보고 있어요.
-          오른쪽에서 팀을 고르면 기본 응원팀이 됩니다.
-        </p>
-      )}
+      <ServerClock
+        activeSource={activeSource}
+        onSourceChange={handleSourceChange}
+      />
 
       <TeamCalendar teamId={displayTeamId} onPickVendor={handlePickVendor} />
 
       {isModalOpen && (
         <TeamOnboardingModal
+          currentTeam={team ?? undefined}
           onPick={handlePickTeamFromModal}
-          onSkip={handleSkipModal}
+          onSkip={handleCloseModal}
         />
       )}
     </main>

@@ -3,18 +3,25 @@
 import { TEAM_LIST } from "@/entities/team";
 
 /**
- * 첫 방문 시 뜨는 응원 팀 선택 딤 모달.
- * - 캘린더 위에 딤(어두운 배경)과 함께 올라와 팀 선택을 부드럽게 유도한다.
- * - 팀을 고르면 기본 응원팀으로 설정되고(onPick), 안 고르고 넘어갈 수도 있다(onSkip).
- * - 딤 영역 클릭이나 "나중에 할게요"로 스킵한다.
+ * 응원 팀 선택/변경 딤 모달.
+ * - 첫 방문 시 팀 선택을 유도하고(currentTeam 없음), 이후 팀 변경에도 재사용한다(currentTeam 있음).
+ * - 캘린더 위에 딤과 함께 올라와, 팀을 고르면 기본 응원팀으로 설정된다(onPick).
+ * - 딤 영역 클릭이나 하단 버튼으로 닫는다(onSkip).
  */
 
 interface Props {
+  currentTeam?: string; // 있으면 변경 모드 (현재 팀 하이라이트)
   onPick: (teamId: string) => void;
   onSkip: () => void;
 }
 
-export default function TeamOnboardingModal({ onPick, onSkip }: Props) {
+export default function TeamOnboardingModal({
+  currentTeam,
+  onPick,
+  onSkip,
+}: Props) {
+  const isChanging = Boolean(currentTeam);
+
   return (
     <div
       className="modal-dim"
@@ -25,10 +32,13 @@ export default function TeamOnboardingModal({ onPick, onSkip }: Props) {
     >
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <p className="modal-eyebrow">⚾ 야구 예매, 여기서 시작</p>
-        <h2 className="modal-title">응원 팀을 골라주세요</h2>
+        <h2 className="modal-title">
+          {isChanging ? "응원 팀 변경" : "응원 팀을 골라주세요"}
+        </h2>
         <p className="modal-sub">
-          고른 팀은 <b>기본 응원팀</b>으로 저장돼, 캘린더·예매처·서버시간이 그 팀
-          기준으로 맞춰져요. 지금 안 골라도 둘러볼 수 있어요.
+          {isChanging
+            ? "바꿀 팀을 골라주세요. 캘린더가 그 팀 기준으로 맞춰져요."
+            : "고른 팀은 기본 응원팀으로 저장돼, 캘린더가 그 팀 기준으로 맞춰져요. 지금 안 골라도 둘러볼 수 있어요."}
         </p>
 
         <div className="modal-team-grid">
@@ -36,8 +46,7 @@ export default function TeamOnboardingModal({ onPick, onSkip }: Props) {
             <button
               key={t.id}
               type="button"
-              className="modal-team-cell"
-              style={{ ["--team" as string]: t.color }}
+              className={`modal-team-cell ${t.id === currentTeam ? "on" : ""}`}
               onClick={() => onPick(t.id)}
             >
               {t.short}
@@ -46,7 +55,7 @@ export default function TeamOnboardingModal({ onPick, onSkip }: Props) {
         </div>
 
         <button type="button" className="modal-skip" onClick={onSkip}>
-          나중에 할게요
+          {isChanging ? "취소" : "나중에 할게요"}
         </button>
       </div>
     </div>
