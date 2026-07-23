@@ -7,6 +7,7 @@ import { VendorKey } from "@/shared/config/vendor-keys";
 import { ServerClock, type ClockSource } from "@/features/server-time";
 import { TeamPicker, TeamOnboardingModal } from "@/features/pick-team";
 import { TeamCalendar } from "@/widgets/team-calendar";
+import { SiteHeader } from "@/widgets/site-header";
 
 /**
  * 메인 화면.
@@ -65,6 +66,8 @@ export default function HomePage() {
 
   return (
     <main className="wrap">
+      <SiteHeader />
+
       <div className="clock-row">
         <ServerClock
           activeSource={activeSource}

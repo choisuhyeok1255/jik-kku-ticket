@@ -25,3 +25,10 @@ export const SITE_KEYWORDS = [
   "KBO 티켓 오픈",
   "야구 예매 시계",
 ];
+
+// 직꾸(본체 웹·모바일 앱) 연결 링크
+export const JIKKKU_HOME_URL = "https://www.jik-kku.com";
+export const APP_STORE_URL =
+  "https://apps.apple.com/kr/app/%EC%A7%81%EA%BE%B8/id6761379053";
+export const GOOGLE_PLAY_URL =
+  "https://play.google.com/store/apps/details?id=com.jikkku.app&pcampaignid=web_share";
