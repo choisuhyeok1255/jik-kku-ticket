@@ -22,11 +22,18 @@ import { VendorKey } from "@/shared/config/vendor-keys";
 interface Props {
   teamId: string;
   onPickVendor: (vendor: VendorKey) => void;
+  onChangeTeam: () => void;
+  isUnset?: boolean;
 }
 
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 
-export default function TeamCalendar({ teamId, onPickVendor }: Props) {
+export default function TeamCalendar({
+  teamId,
+  onPickVendor,
+  onChangeTeam,
+  isUnset,
+}: Props) {
   const [cursor, setCursor] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
@@ -80,8 +87,14 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
         >
           ◀
         </button>
-        <div className="cal-title">
-          {year}년 {month + 1}월 · {myTeam.name}
+        <div className="cal-title-group">
+          <span className="cal-title">
+            {year}년 {month + 1}월 · {myTeam.name}
+            {isUnset && <span className="cal-unset"> (미설정)</span>}
+          </span>
+          <button type="button" className="cal-change" onClick={onChangeTeam}>
+            {isUnset ? "응원팀 선택" : "변경"}
+          </button>
         </div>
         <button className="cal-nav" type="button" onClick={goNext} aria-label="다음 달">
           ▶

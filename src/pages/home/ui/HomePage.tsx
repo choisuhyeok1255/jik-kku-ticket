@@ -3,19 +3,19 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { TEAMS, TEAM_LIST, useMyTeam } from "@/entities/team";
-import { VENDORS } from "@/entities/vendor";
 import { VendorKey } from "@/shared/config/vendor-keys";
 import { ServerClock, type ClockSource } from "@/features/server-time";
 import { TeamOnboardingModal } from "@/features/pick-team";
 import { TeamCalendar } from "@/widgets/team-calendar";
 import { SiteHeader } from "@/widgets/site-header";
+import { AppPromo } from "@/widgets/app-promo";
 
 /**
  * 메인 화면.
  * - 진입하면 바로 캘린더를 보여준다(응원팀 설정은 선택사항).
  * - 첫 방문(팀 미설정 & 온보딩 미열람)이면 딤 모달로 팀 선택을 유도한다.
- * - 상단 팀 바에 현재 응원팀과 "팀 변경" 버튼을 두고, 변경 시 같은 모달을 재사용한다.
- * - 서버시계는 전폭으로 크게, 시계 기본값은 표준시. 캘린더 예매처 버튼으로 예매처 시계로 전환.
+ * - 팀 변경은 캘린더 헤더의 버튼으로 열고, 같은 모달을 재사용한다(변경 모드).
+ * - 서버시계는 전폭, 기본값은 표준시. 캘린더 예매처 버튼으로 예매처 시계로 전환.
  */
 
 export default function HomePage() {
@@ -35,7 +35,6 @@ export default function HomePage() {
   const handleSourceChange = (source: ClockSource) => setActiveSource(source);
   const handlePickVendor = (vendor: VendorKey) => setActiveSource(vendor);
 
-  // 모달에서 팀 선택/변경 (기본 응원팀 설정 + 토스트)
   const handlePickTeamFromModal = (teamId: string) => {
     setTeam(teamId);
     markOnboardingSeen();
@@ -58,41 +57,34 @@ export default function HomePage() {
 
   const displayTeamId = team ?? TEAM_LIST[0].id; // 미설정이면 첫 팀 기준으로 표시
   const isUnset = !team;
-  const displayTeam = TEAMS[displayTeamId];
-  const homeVendor = VENDORS[displayTeam.vendors[0].key];
 
   return (
-    <main className="wrap">
-      <SiteHeader />
+    <div className="page-layout">
+      <main className="wrap">
+        <SiteHeader />
 
-      <div className="team-bar">
-        <div className="team-bar-info">
-          <span
-            className="team-bar-dot"
-            style={{ background: displayTeam.color }}
-          />
-          <span className="team-bar-name">
-            {isUnset ? "응원팀 미설정" : displayTeam.name}
-          </span>
-          <span className="team-bar-vendor">
-            {isUnset ? `${displayTeam.name} 기준` : `예매 ${homeVendor.shortName}`}
-          </span>
+        <ServerClock
+          activeSource={activeSource}
+          onSourceChange={handleSourceChange}
+        />
+
+        <TeamCalendar
+          teamId={displayTeamId}
+          onPickVendor={handlePickVendor}
+          onChangeTeam={() => setIsModalOpen(true)}
+          isUnset={isUnset}
+        />
+
+        {/* 모바일: 광고 섹션을 main 내부(콘텐츠 흐름) 하단에 둔다 */}
+        <div className="promo-inline">
+          <AppPromo />
         </div>
-        <button
-          type="button"
-          className="team-bar-change"
-          onClick={() => setIsModalOpen(true)}
-        >
-          {isUnset ? "응원팀 선택" : "팀 변경"}
-        </button>
-      </div>
+      </main>
 
-      <ServerClock
-        activeSource={activeSource}
-        onSourceChange={handleSourceChange}
-      />
-
-      <TeamCalendar teamId={displayTeamId} onPickVendor={handlePickVendor} />
+      {/* 데스크탑: 광고 섹션을 콘텐츠 옆 사이드에 둔다 */}
+      <aside className="promo-aside">
+        <AppPromo />
+      </aside>
 
       {isModalOpen && (
         <TeamOnboardingModal
@@ -101,6 +93,6 @@ export default function HomePage() {
           onSkip={handleCloseModal}
         />
       )}
-    </main>
+    </div>
   );
 }

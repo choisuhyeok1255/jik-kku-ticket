@@ -37,6 +37,87 @@ a {
   padding: 32px 20px 60px;
 }
 
+/* ---------- 페이지 레이아웃 (콘텐츠 + 앱 프로모 사이드) ---------- */
+.page-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+}
+.page-layout .wrap {
+  margin: 0; /* flex 안에서는 auto 여백을 쓰지 않는다 (프로모가 밀려나는 문제) */
+  flex-shrink: 1;
+}
+.promo-aside {
+  position: sticky;
+  top: 32px;
+  margin-top: 32px;
+  width: 180px;
+  flex-shrink: 0;
+}
+/* 사이드(데스크탑) 광고는 버튼을 세로로 쌓는다 */
+.promo-aside .promo-btns {
+  flex-direction: column;
+}
+.promo-aside .promo-btn {
+  text-align: center;
+}
+.promo-inline {
+  margin-top: 32px;
+}
+.app-promo {
+  background: var(--panel-2);
+  border-radius: 14px;
+  padding: 16px;
+}
+.promo-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin: 0 0 4px;
+}
+.promo-sub {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+.promo-btns {
+  display: flex;
+  gap: 6px;
+}
+.promo-btn {
+  font-size: 12px;
+  font-weight: 700;
+  background: #000;
+  border: 1px solid var(--line);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.promo-btn:hover {
+  background: #111;
+  border-color: var(--muted);
+}
+
+/* 데스크탑(넓은 화면): 사이드 광고 사용, main 내부 광고 숨김 */
+@media (min-width: 1081px) {
+  .promo-inline {
+    display: none;
+  }
+}
+
+/* 좁은 화면: main 내부 광고 사용, 사이드 광고 숨김 (본문과 자동 동일 폭) */
+@media (max-width: 1080px) {
+  .page-layout .wrap {
+    margin: 0 auto;
+  }
+  .promo-aside {
+    display: none;
+  }
+}
+
 /* ---------- header ---------- */
 .head h1 {
   font-size: 26px;
@@ -285,38 +366,48 @@ a {
   padding: 60px 0;
 }
 
-/* ---------- clock source grid (팀 선택과 동일한 그리드 버튼) ---------- */
+/* ---------- clock source radios (컴팩트한 라디오) ---------- */
 .clock-sources {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-bottom: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin-bottom: 12px;
 }
 .clock-source {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 7px 4px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
+  gap: 5px;
+  padding: 2px 0;
+  border: none;
+  background: none;
   color: var(--muted);
   cursor: pointer;
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  transition: color 0.12s ease;
+}
+.clock-source::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  flex-shrink: 0;
+  transition: border-color 0.12s ease, background 0.12s ease;
 }
 .clock-source:hover {
-  background: var(--panel-2);
   color: var(--text);
 }
 .clock-source.on {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-  background: var(--panel-2);
   color: var(--text);
+  font-weight: 700;
+}
+.clock-source.on::before {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 45%, transparent 48%);
 }
 
 /* ---------- calendar (grid) ---------- */
@@ -612,58 +703,32 @@ a {
   background: rgba(198, 233, 0, 0.2);
 }
 
-/* ---------- 팀 바 (현재 응원팀 + 변경 버튼) ---------- */
-.team-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 18px;
-  padding: 12px 14px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-.team-bar-info {
+/* ---------- 캘린더 헤더의 팀 변경 ---------- */
+.cal-title-group {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
-.team-bar-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  flex-shrink: 0;
-}
-.team-bar-name {
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.team-bar-vendor {
-  font-size: 12px;
+.cal-unset {
   color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 400;
 }
-.team-bar-change {
+.cal-change {
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 7px 14px;
+  padding: 3px 10px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--panel-2);
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition: color 0.12s ease, border-color 0.12s ease;
 }
-.team-bar-change:hover {
-  background: var(--line);
+.cal-change:hover {
+  color: var(--text);
   border-color: var(--muted);
 }
 
