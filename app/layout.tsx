@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   verification: {
     other: {
-      "naver-site-verification": "8ffa6be39b3d511b10fd1e5b09476b31fccac8e3",
+      "naver-site-verification": "91cf84e19891ee8fff1886ecec76bf8e22f0df16",
     },
   },
   openGraph: {
