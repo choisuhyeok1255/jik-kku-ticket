@@ -33,6 +33,11 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   category: "sports",
   alternates: { canonical: "/" },
+  verification: {
+    other: {
+      "naver-site-verification": "8ffa6be39b3d511b10fd1e5b09476b31fccac8e3",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "ko_KR",
