@@ -100,7 +100,8 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 4px 6px;
   margin-bottom: 8px;
 }
 .dot {
@@ -151,6 +152,9 @@ a {
   margin-top: 8px;
   font-size: 11px;
   color: var(--muted);
+}
+.clock-host {
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
 }
 
 /* ---------- actions ---------- */

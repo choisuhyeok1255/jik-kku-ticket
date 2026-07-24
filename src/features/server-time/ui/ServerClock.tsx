@@ -40,6 +40,10 @@ export default function ServerClock({ activeSource, onSourceChange }: Props) {
   const label = isStandard
     ? "현재 시각 (표준시)"
     : `${VENDORS[activeSource].name} 서버시간`;
+  // 예매처 소스일 때, 서버시간을 읽어오는 서버 도메인을 표시한다
+  const host = isStandard
+    ? null
+    : new URL(VENDORS[activeSource].pingUrl).hostname;
 
   return (
     <div className="clock" data-state={state}>
@@ -58,7 +62,8 @@ export default function ServerClock({ activeSource, onSourceChange }: Props) {
 
       <div className="clock-label">
         <span className={`dot ${state}`} />
-        {label}
+        <span>{label}</span>
+        {host && <span className="clock-host">· {host}</span>}
       </div>
 
       <div className="clock-time">
