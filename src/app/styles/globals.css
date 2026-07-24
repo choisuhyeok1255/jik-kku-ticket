@@ -52,7 +52,7 @@ a {
   position: sticky;
   top: 32px;
   margin-top: 32px;
-  width: 180px;
+  width: 210px;
   flex-shrink: 0;
 }
 /* 사이드(데스크탑) 광고는 버튼을 세로로 쌓는다 */

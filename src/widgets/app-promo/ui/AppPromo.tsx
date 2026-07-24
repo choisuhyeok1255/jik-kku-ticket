@@ -8,7 +8,7 @@ import { APP_STORE_URL, GOOGLE_PLAY_URL } from "@/shared/config/site";
 export default function AppPromo() {
   return (
     <div className="app-promo">
-      <p className="promo-title">직관 기록은 직꾸 앱에서</p>
+      <p className="promo-title">이미 200명이 직관을 기록 중</p>
       <p className="promo-sub">
         경기만 고르면 자동 기록 · KBO 일정 · 하이라이트까지
       </p>
