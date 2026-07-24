@@ -150,8 +150,16 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
                         href={tv.bookingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        title={`${homeTeam.name} · ${vendor.name} 예매 (시계도 전환)`}
-                        onClick={() => onPickVendor(tv.key)}
+                        title={
+                          vendor.noClock
+                            ? `${homeTeam.name} · ${vendor.name} 예매`
+                            : `${homeTeam.name} · ${vendor.name} 예매 (시계도 전환)`
+                        }
+                        onClick={
+                          vendor.noClock
+                            ? undefined
+                            : () => onPickVendor(tv.key)
+                        }
                       >
                         🎟 {vendor.shortName}
                       </a>

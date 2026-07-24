@@ -81,6 +81,7 @@ export const TEAMS: Record<string, Team> = {
     color: "#fc4e00",
     vendors: [
       { key: "ticketlink", bookingUrl: "https://www.ticketlink.co.kr/sports/137/63" },
+      { key: "hanwha", bookingUrl: "https://www.hanwhaeagles.co.kr/ticketInfo.do" },
     ],
   },
   NC: {

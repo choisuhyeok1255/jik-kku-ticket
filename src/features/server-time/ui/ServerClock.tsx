@@ -21,7 +21,10 @@ interface Props {
 
 const TABS: { key: ClockSource; label: string }[] = [
   { key: "standard", label: "표준시" },
-  ...Object.values(VENDORS).map((v) => ({ key: v.key, label: v.shortName })),
+  // noClock 예매처(서버시간 관측 불가)는 시계 소스에서 제외한다
+  ...Object.values(VENDORS)
+    .filter((v) => !v.noClock)
+    .map((v) => ({ key: v.key, label: v.shortName })),
 ];
 
 const getNote = (state: ClockState, isStandard: boolean): string => {

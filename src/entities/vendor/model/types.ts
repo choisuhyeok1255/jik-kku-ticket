@@ -11,4 +11,5 @@ export interface Vendor {
   name: string;
   shortName: string;
   pingUrl: string;
+  noClock?: boolean; // true면 시계 소스에서 제외 (예매 링크 전용 예매처)
 }
