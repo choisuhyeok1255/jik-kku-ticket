@@ -446,6 +446,24 @@ a {
   font-size: 13px;
   padding: 20px 0;
 }
+.cal-cell.today {
+  border-color: var(--accent-2);
+  box-shadow: inset 0 0 0 1px var(--accent-2);
+}
+.cal-cell.today .cal-day {
+  color: var(--accent-2);
+  font-weight: 800;
+}
+.cal-cell.past {
+  opacity: 0.45;
+}
+.cal-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.cal-nav:disabled:hover {
+  background: var(--panel);
+}
 
 /* ---------- 팀 선택 딤 모달 ---------- */
 .modal-dim {
@@ -644,25 +662,15 @@ a {
   border-color: var(--muted);
 }
 
-/* 모바일: 시계 폰트 축소 + 좁은 7열 캘린더 셀 정보가 넘치지 않게 */
-@media (max-width: 480px) {
-  .games {
-    grid-template-columns: 1fr;
-  }
-  .clock-time {
-    font-size: 34px;
-  }
-  .clock-time .ms {
-    font-size: 16px;
-    min-width: 28px;
-  }
+/* 좁은 폭: 7열 캘린더 셀이 작아지는 구간(≤600px)에서 셀 요소 축소 + 넘침 방지 */
+@media (max-width: 600px) {
   .cal-grid,
   .cal-dow {
     gap: 4px;
   }
   .cal-cell {
     aspect-ratio: auto;
-    min-height: 66px;
+    min-height: 62px;
     padding: 3px;
     overflow: hidden;
   }
@@ -674,10 +682,24 @@ a {
     padding: 0 4px;
   }
   .cal-opp-big {
-    font-size: 15px;
+    font-size: 14px;
   }
   .cal-book-link {
     font-size: 8px;
     padding: 1px 3px;
+  }
+}
+
+/* 모바일: 시계 폰트 축소 */
+@media (max-width: 480px) {
+  .games {
+    grid-template-columns: 1fr;
+  }
+  .clock-time {
+    font-size: 34px;
+  }
+  .clock-time .ms {
+    font-size: 16px;
+    min-width: 28px;
   }
 }

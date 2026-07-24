@@ -43,6 +43,11 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
     gamesByDay.set(day, g);
   });
 
+  const now = new Date();
+  const isCurrentMonth =
+    year === now.getFullYear() && month === now.getMonth();
+  const todayDate = now.getDate();
+
   const firstDow = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const cells: (number | null)[] = [
@@ -50,10 +55,12 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
 
-  const goPrev = () =>
+  const goPrev = () => {
+    if (isCurrentMonth) return; // 예매 캘린더라 지난 달로는 이동하지 않음
     setCursor(({ year, month }) =>
       month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 }
     );
+  };
   const goNext = () =>
     setCursor(({ year, month }) =>
       month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 }
@@ -64,7 +71,13 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
   return (
     <section className="cal">
       <div className="cal-head">
-        <button className="cal-nav" type="button" onClick={goPrev} aria-label="이전 달">
+        <button
+          className="cal-nav"
+          type="button"
+          onClick={goPrev}
+          disabled={isCurrentMonth}
+          aria-label="이전 달"
+        >
           ◀
         </button>
         <div className="cal-title">
@@ -87,10 +100,17 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
         {cells.map((day, idx) => {
           if (day === null) return <div key={`e${idx}`} className="cal-cell empty" />;
 
+          const isToday = isCurrentMonth && day === todayDate;
+          const isPast = isCurrentMonth && day < todayDate; // 오늘 이전 = 지난 경기
           const game = gamesByDay.get(day);
           if (!game) {
             return (
-              <div key={day} className="cal-cell">
+              <div
+                key={day}
+                className={`cal-cell ${isToday ? "today" : ""} ${
+                  isPast ? "past" : ""
+                }`}
+              >
                 <span className="cal-day">{day}</span>
               </div>
             );
@@ -102,7 +122,12 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
             TEAMS[TEAM_KEY_BY_DB_ID[isHome ? game.away_team_id : game.home_team_id]];
 
           return (
-            <div key={day} className="cal-cell has-game">
+            <div
+              key={day}
+              className={`cal-cell has-game ${isToday ? "today" : ""} ${
+                isPast ? "past" : ""
+              }`}
+            >
               <span className="cal-day">{day}</span>
               <span
                 className={`cal-flag ${isHome ? "home" : "away"}`}
@@ -111,7 +136,8 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
                 {isHome ? "홈" : "원정"}
               </span>
               <span className="cal-opp-big">{opponent.short}</span>
-              <div className="cal-books">
+              {!isPast && (
+                <div className="cal-books">
                 {homeTeam.vendors.map((tv) => {
                   const vendor = VENDORS[tv.key];
 
@@ -145,7 +171,8 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
                     </button>
                   );
                 })}
-              </div>
+                </div>
+              )}
             </div>
           );
         })}
