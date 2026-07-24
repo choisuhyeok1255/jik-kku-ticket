@@ -40,7 +40,7 @@ export const VENDORS: Record<VendorKey, Vendor> = {
   hanwha: {
     key: "hanwha",
     name: "한화 이글스",
-    shortName: "한화",
+    shortName: "한화 공식",
     // 한화 홈페이지는 Date 헤더를 주지 않아 서버시간 관측이 안 되므로 시계 소스에서 제외한다.
     pingUrl: "https://www.hanwhaeagles.co.kr",
     noClock: true,
