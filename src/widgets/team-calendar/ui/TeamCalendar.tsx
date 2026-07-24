@@ -131,7 +131,7 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
               <span className="cal-day">{day}</span>
               <span
                 className={`cal-flag ${isHome ? "home" : "away"}`}
-                style={isHome ? { background: myTeam.color } : undefined}
+                style={{ background: homeTeam.color }}
               >
                 {isHome ? "홈" : "원정"}
               </span>
@@ -147,6 +147,7 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
                       <a
                         key={tv.key}
                         className="cal-book-link"
+                        style={{ ["--book" as string]: homeTeam.color }}
                         href={tv.bookingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -161,7 +162,7 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
                             : () => onPickVendor(tv.key)
                         }
                       >
-                        🎟 {vendor.shortName}
+                        {vendor.shortName}
                       </a>
                     );
                   }
@@ -172,10 +173,11 @@ export default function TeamCalendar({ teamId, onPickVendor }: Props) {
                       key={tv.key}
                       type="button"
                       className="cal-book-link"
+                      style={{ ["--book" as string]: homeTeam.color }}
                       title={`${vendor.name} 서버시간 보기`}
                       onClick={() => onPickVendor(tv.key)}
                     >
-                      🕐 {vendor.shortName}
+                      {vendor.shortName}
                     </button>
                   );
                 })}
