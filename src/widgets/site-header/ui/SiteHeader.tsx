@@ -1,8 +1,4 @@
-import {
-  JIKKKU_HOME_URL,
-  APP_STORE_URL,
-  GOOGLE_PLAY_URL,
-} from "@/shared/config/site";
+import { JIKKKU_HOME_URL } from "@/shared/config/site";
 
 /**
  * 상단 링크 바.
@@ -24,22 +20,6 @@ export default function SiteHeader() {
           rel="noopener noreferrer"
         >
           직꾸 홈
-        </a>
-        <a
-          className="sf-link"
-          href={APP_STORE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          App Store
-        </a>
-        <a
-          className="sf-link"
-          href={GOOGLE_PLAY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Google Play
         </a>
       </nav>
     </header>
