@@ -3,7 +3,7 @@ import { Team } from "../model/types";
 /**
  * KBO 구단 목록.
  * - vendors: 각 구단 홈경기 예매처 + 그 구단 전용 예매 링크.
- *   (티켓링크 5개 구단은 링크 입력됨, 나머지는 추후 입력 예정으로 빈 값)
+ *   (각 구단 예매 페이지 링크 입력 완료)
  */
 export const TEAMS: Record<string, Team> = {
   LG: {
@@ -20,21 +20,25 @@ export const TEAMS: Record<string, Team> = {
     name: "두산 베어스",
     short: "두산",
     color: "#131230",
-    vendors: [{ key: "nol", bookingUrl: "" }],
+    vendors: [
+      { key: "nol", bookingUrl: "https://nol.yanolja.com/ticket/genre/sports/bears" },
+    ],
   },
   KIWOOM: {
     id: "KIWOOM",
     name: "키움 히어로즈",
     short: "키움",
     color: "#570514",
-    vendors: [{ key: "nol", bookingUrl: "" }],
+    vendors: [
+      { key: "nol", bookingUrl: "https://nol.yanolja.com/ticket/genre/sports/heroes" },
+    ],
   },
   SSG: {
     id: "SSG",
     name: "SSG 랜더스",
     short: "SSG",
     color: "#ce0e2d",
-    vendors: [{ key: "ssg", bookingUrl: "" }],
+    vendors: [{ key: "ssg", bookingUrl: "https://ticket.ssg.com/ticket" }],
   },
   KT: {
     id: "KT",
@@ -68,7 +72,7 @@ export const TEAMS: Record<string, Team> = {
     name: "롯데 자이언츠",
     short: "롯데",
     color: "#041e42",
-    vendors: [{ key: "lotte", bookingUrl: "" }],
+    vendors: [{ key: "lotte", bookingUrl: "https://www.giantsclub.com/" }],
   },
   HANWHA: {
     id: "HANWHA",
@@ -84,7 +88,7 @@ export const TEAMS: Record<string, Team> = {
     name: "NC 다이노스",
     short: "NC",
     color: "#315288",
-    vendors: [{ key: "nc", bookingUrl: "" }],
+    vendors: [{ key: "nc", bookingUrl: "https://www.ncdinos.com/" }],
   },
 };
 
