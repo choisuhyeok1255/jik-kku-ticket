@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { VENDORS } from "@/entities/vendor";
 import { VendorKey } from "@/shared/config/vendor-keys";
-import { getVendorServerTime } from "@/features/server-time/api/vendorServerTime";
+import { getVendorServerTime } from "@/features/server-time/index.server";
 
 // 이 라우트는 항상 런타임에 실행되어야 합니다 (요청 시점의 실제 시각을 내려줘야 하므로)
 export const dynamic = "force-dynamic";
