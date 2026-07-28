@@ -26,7 +26,11 @@ interface UseServerClockResult {
 }
 
 export function useServerClock(vendor?: string): UseServerClockResult {
-  const { data: serverTimeSample, isError: isServerTimeError } = useQuery({
+  const {
+    data: serverTimeSample,
+    isError: isServerTimeError,
+    isPlaceholderData: isPreviousSourceSample,
+  } = useQuery({
     queryKey: serverTimeKeys.source(vendor),
     queryFn: () => fetchServerTime(vendor),
     refetchInterval: 30_000,
@@ -45,6 +49,7 @@ export function useServerClock(vendor?: string): UseServerClockResult {
 
   const state: ClockState = getClockState(
     isServerTimeError,
+    isPreviousSourceSample,
     serverTimeSample?.ok
   );
 
@@ -52,8 +57,14 @@ export function useServerClock(vendor?: string): UseServerClockResult {
 }
 
 /** 쿼리 상태 + 응답 ok 여부를 시계 표시 상태로 변환한다. */
-function getClockState(isError: boolean, ok?: boolean): ClockState {
+function getClockState(
+  isError: boolean,
+  isPreviousSourceSample: boolean,
+  ok?: boolean
+): ClockState {
   if (isError) return "error";
+  // 아직 이전 소스의 값을 보여주는 중이므로 이 소스와 동기화됐다고 말할 수 없다
+  if (isPreviousSourceSample) return "loading";
   if (ok === undefined) return "loading"; // 아직 첫 응답 전
   return ok ? "synced" : "error";
 }
