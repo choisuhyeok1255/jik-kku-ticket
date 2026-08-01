@@ -24,8 +24,16 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-laundry), -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", Roboto, sans-serif;
+  font-family:
+    var(--font-laundry),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Apple SD Gothic Neo",
+    "Malgun Gothic",
+    "Noto Sans KR",
+    Roboto,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -119,7 +127,9 @@ a {
   color: #fff;
   border-radius: 8px;
   padding: 8px 14px;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
 }
 .promo-btn:hover {
   background: #111;
@@ -291,7 +301,9 @@ a {
   font-weight: 700;
   font-size: 15px;
   border-radius: 10px;
-  transition: transform 0.08s ease, filter 0.15s ease;
+  transition:
+    transform 0.08s ease,
+    filter 0.15s ease;
 }
 .go:hover {
   filter: brightness(1.1);
@@ -325,7 +337,9 @@ a {
   cursor: pointer;
   color: var(--text);
   font-family: inherit;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
 }
 .game:hover {
   background: var(--panel-2);
@@ -421,7 +435,9 @@ a {
   border-radius: 50%;
   border: 2px solid var(--line);
   flex-shrink: 0;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
 }
 .clock-source:hover {
   color: var(--text);
@@ -507,7 +523,9 @@ a {
 }
 .cal-cell.has-game {
   border-color: var(--muted);
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
 }
 .cal-cell.has-game:not(.past):hover {
   background: var(--panel-2);
@@ -645,7 +663,9 @@ a {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
 }
 .modal-team-cell:hover {
   background: var(--line);
@@ -668,7 +688,9 @@ a {
   font-family: inherit;
   font-size: 14px;
   cursor: pointer;
-  transition: color 0.12s ease, border-color 0.12s ease;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
 }
 .modal-skip:hover {
   color: var(--text);
@@ -711,7 +733,10 @@ a {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--panel);
-  transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease;
 }
 .sf-link:hover {
   color: var(--text);
@@ -750,7 +775,9 @@ a {
   color: var(--muted);
   cursor: pointer;
   font-family: inherit;
-  transition: color 0.12s ease, border-color 0.12s ease;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
 }
 .cal-change:hover {
   color: var(--text);
@@ -855,7 +882,9 @@ a {
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
 }
 .pr-vendor-card:hover {
   border-color: var(--accent-2);
@@ -912,7 +941,10 @@ a {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.35);
   cursor: not-allowed;
-  transition: background 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease,
+    border-color 0.1s ease;
 }
 .pr-enter.on {
   background: var(--accent);
@@ -975,7 +1007,9 @@ a {
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
 }
 .pr-zone-card:hover {
   border-color: var(--accent);
@@ -1239,7 +1273,10 @@ a {
   background: var(--panel-2);
   color: var(--muted);
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease;
 }
 .pr-count:hover {
   color: var(--text);
@@ -1292,7 +1329,10 @@ a {
   background: var(--panel-2);
   color: var(--muted);
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease;
 }
 .pr-level:hover {
   color: var(--text);
