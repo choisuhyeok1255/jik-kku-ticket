@@ -9,6 +9,7 @@
   --accent: #5724f0;
   --accent-2: #c6e900;
   --surface-deep: #0a0a0a;
+  --danger: #ff8080; /* 실패·오류를 알리는 색 */
 }
 
 * {
@@ -772,4 +773,516 @@ a {
     font-size: 16px;
     min-width: 28px;
   }
+}
+
+/* ================= 포도알 연습 (/practice) ================= */
+.pr-intro {
+  margin-bottom: 20px;
+}
+.pr-heading {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+.pr-lead {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pr-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 20px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.pr-eyebrow {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.pr-title {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.pr-sub {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- 예매처 선택 ---------- */
+.pr-vendor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.pr-vendor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.pr-vendor-card:hover {
+  border-color: var(--accent-2);
+  background: rgba(198, 233, 0, 0.08);
+}
+.pr-vendor-name {
+  font-size: 15px;
+}
+.pr-vendor-point {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.pr-vendor-detail {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ---------- 오픈 대기 (남은 시간만 보여준다) ---------- */
+.pr-countdown {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0 20px;
+}
+.pr-countdown-value {
+  font-size: 46px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  min-width: 118px; /* 숫자가 바뀌어도 좌우로 흔들리지 않게 */
+  text-align: right;
+}
+.pr-countdown-unit {
+  font-size: 14px;
+  color: var(--muted);
+}
+.pr-countdown-open {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.pr-enter {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.35);
+  cursor: not-allowed;
+  transition: background 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+}
+.pr-enter.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.pr-enter.on:hover {
+  filter: brightness(1.12);
+}
+
+.pr-hint {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.pr-hint p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.pr-hint b {
+  color: var(--text);
+}
+.pr-hint p.pr-hint-key {
+  font-size: 12px;
+}
+.pr-hint kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--panel-2);
+  color: var(--text);
+}
+.pr-hint p.pr-hint-now {
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+/* ---------- 구역 선택 ---------- */
+.pr-zone-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.pr-zone-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.pr-zone-card:hover {
+  border-color: var(--accent);
+  background: rgba(87, 36, 240, 0.16);
+}
+.pr-zone-name {
+  font-size: 15px;
+}
+.pr-zone-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+.pr-zone-left {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+/* ---------- 좌석(포도알) ---------- */
+/* 실제 예매창처럼 작고 촘촘하게. 폭에 맞춰 늘어나지 않도록 크기를 고정한다 */
+.pr-seat-grid {
+  --seat: 11px;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--seat));
+  gap: 3px;
+  justify-content: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow-x: auto;
+}
+.pr-seat {
+  width: var(--seat);
+  height: var(--seat);
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.pr-seat.open {
+  background: var(--accent-2);
+}
+.pr-seat.taken {
+  background: rgba(255, 255, 255, 0.13);
+  cursor: not-allowed;
+}
+
+/* ---------- 보안문자 ---------- */
+.pr-captcha {
+  display: block;
+  margin: 0 auto 14px;
+  border-radius: 10px;
+}
+.pr-captcha-form {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.pr-captcha-input {
+  flex: 1;
+  max-width: 240px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+}
+.pr-captcha-input:focus {
+  outline: none;
+  border-color: var(--accent-2);
+}
+.pr-captcha-input.wrong {
+  border-color: var(--danger);
+}
+.pr-captcha-submit {
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.pr-captcha-error {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--danger);
+}
+.pr-captcha-refresh {
+  margin-top: 12px;
+  padding: 0;
+  font-size: 12px;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- 결과 ---------- */
+.pr-total {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.pr-total-value {
+  font-size: 38px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-2);
+}
+.pr-total-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.pr-newbest {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.pr-best {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.pr-steps {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.pr-steps li {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 2px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--line);
+}
+.pr-steps li span {
+  color: var(--muted);
+}
+.pr-steps li b {
+  font-variant-numeric: tabular-nums;
+}
+/* 실수 횟수는 다음 판에 줄여야 할 값이라 눈에 띄게 둔다 */
+.pr-steps li.pr-miss b {
+  color: var(--danger);
+}
+.pr-retry {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.pr-retry:hover {
+  filter: brightness(1.12);
+}
+.pr-quit {
+  display: block;
+  margin: 0 auto;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .pr-vendor-grid,
+  .pr-zone-grid {
+    grid-template-columns: 1fr;
+  }
+  .pr-countdown-value {
+    font-size: 38px;
+    min-width: 98px;
+  }
+  /* 모바일은 손가락으로 눌러야 해 좌석을 조금 키운다 */
+  .pr-seat-grid {
+    --seat: 13px;
+    gap: 3px;
+    padding: 10px;
+    justify-content: start;
+  }
+}
+
+/* ---------- 연습: 매수 미션 / 좌석 선택 상태 ---------- */
+.pr-mission {
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  display: inline-block;
+  font-size: 13px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
+}
+.pr-mission b {
+  color: var(--accent-2);
+}
+
+.pr-pick-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.pr-pick-count {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-2);
+}
+.pr-pick-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pr-seat.picked {
+  background: var(--accent);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.65) inset;
+}
+
+/* ---------- 연습: 장수 선택 / 실패 결과 ---------- */
+.pr-count-group {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 26px;
+}
+.pr-count {
+  min-width: 62px;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.pr-count:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+.pr-count.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.pr-title-gap {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.pr-eyebrow.fail {
+  color: var(--danger);
+}
+.pr-total-value.fail {
+  color: var(--danger);
+}
+.pr-fail-tip {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: left;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+}
+
+/* ---------- 연습: 난이도 선택 ---------- */
+.pr-level-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.pr-level {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 10px;
+  font-family: inherit;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.pr-level:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+.pr-level b {
+  font-size: 14px;
+  color: var(--text);
+}
+.pr-level span {
+  font-size: 11px;
+}
+.pr-level small {
+  font-size: 10px;
+  opacity: 0.7;
+}
+.pr-level.on {
+  background: rgba(87, 36, 240, 0.22);
+  border-color: var(--accent);
+  color: var(--text);
 }
