@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { TEAMS, useMyTeam, teamColorVars } from "@/entities/team";
 import { SiteHeader } from "@/widgets/site-header";
 import {
   CaptchaInput,
@@ -39,6 +39,7 @@ export default function PracticePage() {
     reset,
   } = usePracticeRun();
   const { getBest, submitRecord } = useBestRecord();
+  const { team } = useMyTeam();
   const [isNewBest, setIsNewBest] = useState(false);
 
   // 고른 장수를 다 잡으면 예매 성공 — 그때의 총 소요 시간으로 기록을 갱신한다
@@ -72,15 +73,16 @@ export default function PracticePage() {
   const showsSummary = showsResult || session?.phase === "soldout";
 
   return (
-    <main className="wrap">
+    /* 메인과 같은 응원팀 색을 쓴다 — 두 화면을 오가도 같은 서비스로 읽히게 */
+    <main
+      className="wrap themed"
+      style={teamColorVars(team ? TEAMS[team] : undefined)}
+    >
       <SiteHeader />
 
+      {/* 홈으로 가는 길은 헤더의 브랜드 하나로 모았다.
+          아래 '연습 그만두기'는 이 판을 처음으로 되돌릴 뿐 페이지를 벗어나지 않는다 */}
       <div className="pr-intro">
-        {/* 아래 '연습 그만두기'는 이 판을 처음으로 되돌릴 뿐 페이지를 벗어나지 않는다.
-            나가는 길은 위치와 문구를 갈라 헷갈리지 않게 둔다 */}
-        <Link className="pr-back" href="/">
-          ← 홈으로
-        </Link>
         <h1 className="pr-heading">포도알 연습</h1>
         <p className="pr-lead">
           예매 오픈부터 좌석 잡기까지, 실제 절차 그대로 연습해요.

@@ -1,16 +1,80 @@
-:root {
-  /* victory 톤: 거의 검은 다크 배경 + 반투명 흰색 표면, 보라 primary·라임 보조 */
-  --bg: #0a0a0a;
-  --panel: rgba(255, 255, 255, 0.05);
-  --panel-2: rgba(255, 255, 255, 0.09);
-  --line: rgba(255, 255, 255, 0.1);
-  --text: #ffffff;
-  --muted: rgba(255, 255, 255, 0.78);
-  --accent: #5724f0;
-  --accent-2: #c6e900;
-  /* 실패·오류를 알리는 텍스트·테두리 색.
-     서버시계 상태점(.dot)은 초록/노랑/빨강 신호등 세트로 따로 관리한다 */
-  --danger: #ff8080;
+/* ============================================================================
+   직꾸 티켓 — 전역 스타일
+   ----------------------------------------------------------------------------
+   컨셉: "초읽기". 화면을 비우고 큰 숫자 하나에 집중시킨다.
+   색은 화면에 한 점만 쓰고, 그 한 점이 응원팀 색이다.
+
+   색 규칙 (이걸 어기면 대비가 깨진다)
+   - 팀 색(--team)은 점 · 선 · 큰 숫자 · 칠한 면에만. 이 자리들은 3:1이면 충분하다.
+   - 작은 글자는 --fg / --mu 로. 4.5:1이 필요한데 한화·KIA 팀 색이 이를 못 넘긴다.
+   - 오류·실패는 팀과 무관한 뜻이므로 --seal(인주)을 쓴다.
+
+   테마는 <html data-theme>로 정해지고, 첫 페인트 전에 인라인 스크립트가 값을 박는다.
+   (features/theme 참고)
+   ========================================================================== */
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* 바탕 — 화선지 */
+  --bg: #f1f2ef;
+  --bg-2: #e8eae5; /* 살짝 눌린 면 (선택된 칸 등) */
+
+  /* 글자 · 선. 괄호는 --bg 위에서의 대비 */
+  --fg: #17191a; /* 15.70 — 본문 */
+  --mu: #6b6f69; /* 4.55 — 작은 글자(라벨·메타·힌트) */
+  --ln2: #898d87; /* 3.00 — 뜻이 있는 선·점·테두리 */
+  --ln: #d6d9d4; /* 1.55 — 칸만 나누는 장식 괘선 */
+
+  /* 인주 — 오류·실패. 팀과 무관한 고정 의미색 */
+  --seal: #c0342b; /* 4.96 */
+  --ok: #2f6b4f; /* 동기화됨 */
+
+  /* 응원팀 색. 팀을 고르기 전에는 인주로 대신한다 (JS가 --team을 덮어쓴다) */
+  --team: #c0342b;
+  --on-team: #ffffff;
+
+  --shadow: 0 6px 20px rgba(20, 25, 20, 0.13);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* 바탕 — 먹지 */
+  --bg: #131416;
+  --bg-2: #1b1d1f;
+
+  --fg: #eceded; /* 14.90 */
+  --mu: #9ba09a; /* 6.02 */
+  --ln2: #6e746e; /* 3.03 */
+  --ln: #2b2e30; /* 1.35 */
+
+  --seal: #ff8578; /* 7.28 */
+  --ok: #6ecfa2;
+
+  --team: #ff8578;
+  --on-team: #131416;
+
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* OS 설정만 있고 저장값이 없을 때를 위한 대비. data-theme이 항상 붙으므로 보조 역할이다 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #131416;
+    --bg-2: #1b1d1f;
+    --fg: #eceded;
+    --mu: #9ba09a;
+    --ln2: #6e746e;
+    --ln: #2b2e30;
+    --seal: #ff8578;
+    --ok: #6ecfa2;
+    --team: #ff8578;
+    --on-team: #131416;
+    --shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  }
 }
 
 * {
@@ -22,7 +86,7 @@ body {
   padding: 0;
   margin: 0;
   background: var(--bg);
-  color: var(--text);
+  color: var(--fg);
   font-family:
     var(--font-laundry),
     -apple-system,
@@ -33,6 +97,7 @@ body {
     "Noto Sans KR",
     Roboto,
     sans-serif;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -44,6 +109,40 @@ html {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* 키보드로 옮겨다닐 때 지금 어디인지 항상 보이게 한다 */
+:focus-visible {
+  outline: 2px solid var(--team);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- 응원팀 색 주입 ----------
+   구단 색은 밝은 화면용·어두운 화면용 두 벌이다(검정·감색 구단은 어두운 배경에서 안 보임).
+   컴포넌트가 두 값을 --team-l / --team-d 로 심어두면, 여기서 현재 테마에 맞는 쪽을 고른다.
+   덕분에 컴포넌트는 테마를 몰라도 되고, 테마를 바꿔도 다시 그리지 않는다. */
+.themed {
+  --team: var(--team-l, #c0342b);
+}
+:root[data-theme="dark"] .themed {
+  --team: var(--team-d, #ff8578);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .themed {
+    --team: var(--team-d, #ff8578);
+  }
 }
 
 /* ---------- 접근성 유틸 ---------- */
@@ -60,1159 +159,1120 @@ a {
   white-space: nowrap;
 }
 
+/* ============================================================
+   레이아웃
+   ============================================================ */
 .wrap {
-  max-width: 720px;
+  max-width: 620px;
   margin: 0 auto;
-  padding: 32px 20px 60px;
+  padding: 34px 22px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 38px;
 }
 
-/* ---------- 페이지 레이아웃 (콘텐츠 + 앱 프로모 사이드) ---------- */
 .page-layout {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 24px;
+  gap: 28px;
 }
 .page-layout .wrap {
   margin: 0; /* flex 안에서는 auto 여백을 쓰지 않는다 (프로모가 밀려나는 문제) */
   flex-shrink: 1;
-  /* 폭을 콘텐츠 양에 맡기면, 불러오는 동안 본문이 좁아졌다가
-     내용이 채워질 때 옆으로 튀어 보인다. max-width 안에서 폭을 고정한다 */
+  /* 폭을 콘텐츠 양에 맡기면 불러오는 동안 본문이 좁아졌다 넓어지며 옆으로 튄다 */
   width: 100%;
 }
+
 .promo-aside {
   position: sticky;
-  top: 32px;
-  margin-top: 32px;
-  width: 210px;
+  top: 30px;
+  margin-top: 30px;
+  width: 190px;
   flex-shrink: 0;
-}
-/* 사이드(데스크탑) 광고는 버튼을 세로로 쌓는다 */
-.promo-aside .promo-btns {
+  display: flex;
   flex-direction: column;
+  gap: 14px;
 }
-.promo-aside .promo-btn {
-  text-align: center;
-}
+/* 좁은 화면에서는 헤더 바로 아래, 시계 위에 온다.
+   시계가 이 화면의 주인공이므로 배너는 선 하나 높이로 눌러 자리를 적게 쓴다 */
 .promo-inline {
-  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: -6px;
 }
+.promo-inline .app-promo {
+  padding-top: 10px;
+}
+.promo-inline .promo-sub {
+  display: none; /* 첫 화면에서는 제목과 링크만 남긴다 */
+}
+
+.loading-line {
+  color: var(--mu);
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  padding: 48px 0;
+}
+
+/* ---------- 광고·유도 배너 ---------- */
+/* 시계의 여백을 방해하지 않도록 선 하나로 눕힌다 */
 .app-promo {
-  background: var(--panel-2);
-  border-radius: 14px;
-  padding: 16px;
+  border-top: 1px solid var(--ln);
+  padding-top: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.promo-text {
+  min-width: 0;
 }
 .promo-title {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 2px;
 }
 .promo-sub {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 13px;
+  color: var(--mu);
   line-height: 1.5;
-  margin: 0 0 14px;
+  margin: 0;
 }
 .promo-btns {
   display: flex;
-  gap: 6px;
+  gap: 14px;
+  flex-shrink: 0;
 }
 .promo-btn {
-  font-size: 12px;
-  font-weight: 700;
-  background: #000;
-  border: 1px solid var(--line);
-  color: #fff;
-  border-radius: 8px;
-  padding: 8px 14px;
-  transition:
-    background 0.12s ease,
-    border-color 0.12s ease;
-}
-/* 포도알 연습 유도 카드 — 앱 프로모 카드 바로 아래에 쌓인다 */
-.practice-promo {
-  margin-top: 12px;
-}
-/* 연습으로 유도하는 단일 버튼이라 카드 폭을 꽉 채워 눌러야 할 곳임을 분명히 한다 */
-.practice-btn {
-  display: block;
-  text-align: center;
-  background: var(--accent);
-  border-color: transparent;
-}
-.practice-btn:hover {
-  background: var(--accent);
-  filter: brightness(1.12);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--fg);
+  border-bottom: 1px solid var(--ln2);
+  padding-bottom: 2px;
+  white-space: nowrap;
+  transition: border-color 0.12s ease;
 }
 .promo-btn:hover {
-  background: #111;
-  border-color: var(--muted);
+  border-color: var(--fg);
+}
+/* 연습 유도는 이 사이트 안의 동선이라 팀 색 밑줄로 한 단계 세운다 */
+.practice-btn {
+  border-bottom: 2px solid var(--team);
+}
+.practice-btn:hover {
+  border-color: var(--team);
 }
 
-/* 데스크탑(넓은 화면): 사이드 광고 사용, main 내부 광고 숨김 */
+/* 데스크탑: 사이드 배너 사용, 본문 안 배너 숨김 */
 @media (min-width: 1081px) {
   .promo-inline {
     display: none;
   }
-  /* 사이드에 고정된 연습 카드가 스크롤과 무관하게 늘 보이므로 헤더 링크는 감춘다.
-     기준선은 사이드 광고가 사라지는 폭과 같게 둔다 — 어긋나면 카드가 본문 아래로 밀렸는데
-     헤더 링크도 없는 구간이 생겨, 첫 화면에서 연습으로 갈 길이 사라진다 */
-  .sf-link.practice {
-    display: none;
+  /* 사이드는 폭이 좁아 좌우로 못 가르므로 설명 아래로 링크를 내린다 */
+  .promo-aside .app-promo {
+    flex-direction: column;
+    gap: 9px;
+  }
+  .promo-aside .promo-btns {
+    flex-direction: column;
+    gap: 7px;
+    align-items: flex-start;
   }
 }
-
-/* 좁은 화면: main 내부 광고 사용, 사이드 광고 숨김 (본문과 자동 동일 폭)
-   본문 정렬은 .page-layout의 justify-content: center가 그대로 처리하므로 따로 손대지 않는다 */
+/* 좁은 화면: 본문 안 배너 사용, 사이드 숨김 */
 @media (max-width: 1080px) {
   .promo-aside {
     display: none;
   }
 }
 
-/* ---------- server clock ---------- */
-.clock {
-  margin: 20px 0;
-  padding: 18px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  text-align: center;
-}
-.clock-label {
-  font-size: 12px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 4px 6px;
-  margin-bottom: 8px;
-}
-/* 서버시계 상태점. 회색·초록·노랑·빨강이 한 세트로 읽히는 신호등이라
-   --danger 같은 의미 색과 섞지 않고 여기서 따로 관리한다 */
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6b7280;
-}
-.dot.synced {
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e88;
-}
-.dot.error {
-  background: #ef4444;
-}
-.dot.loading {
-  background: #eab308;
-}
-.clock-time {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  font-size: 44px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 2px;
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
-}
-.clock-time .colon {
-  color: var(--muted);
-  animation: blink 1s steps(1) infinite;
-}
-.clock-time .ms {
-  font-size: 20px;
-  color: var(--text);
-  margin-left: 2px;
-  min-width: 34px;
-  text-align: left;
-}
-@keyframes blink {
-  50% {
-    opacity: 0.3;
-  }
-}
-.clock-note {
-  margin-top: 8px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.clock-host {
-  font-family: "SF Mono", "Menlo", "Consolas", monospace;
-}
-
-.loading-line {
-  color: var(--muted);
-  text-align: center;
-  padding: 60px 0;
-}
-
-/* ---------- clock source radios (컴팩트한 라디오) ---------- */
-.clock-sources {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 14px;
-  margin-bottom: 12px;
-}
-.clock-source {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 0;
-  border: none;
-  background: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-  transition: color 0.12s ease;
-}
-.clock-source::before {
-  content: "";
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid var(--line);
-  flex-shrink: 0;
-  transition:
-    border-color 0.12s ease,
-    background 0.12s ease;
-}
-.clock-source:hover {
-  color: var(--text);
-}
-.clock-source.on {
-  color: var(--text);
-  font-weight: 700;
-}
-.clock-source.on::before {
-  border-color: var(--accent);
-  background: radial-gradient(circle, var(--accent) 0 45%, transparent 48%);
-}
-
-/* ---------- calendar (grid) ---------- */
-.cal {
-  margin-top: 26px;
-}
-.cal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-.cal-title {
-  font-size: 15px;
-  font-weight: 700;
-}
-.cal-nav {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  color: var(--text);
-  border-radius: 8px;
-  width: 34px;
-  height: 34px;
-  cursor: pointer;
-  font-size: 13px;
-  font-family: inherit;
-  transition: background 0.12s ease;
-}
-.cal-nav:hover {
-  background: var(--panel-2);
-}
-.cal-dow {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-bottom: 6px;
-}
-.cal-dow span {
-  text-align: center;
-  font-size: 11px;
-  color: var(--muted);
-}
-.cal-dow .sun {
-  color: #f87171;
-}
-.cal-dow .sat {
-  color: #60a5fa;
-}
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-.cal-cell {
-  aspect-ratio: 1;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--panel);
-  padding: 5px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.cal-cell.empty {
-  border: none;
-  background: transparent;
-}
-.cal-day {
-  font-size: 11px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.cal-cell.has-game {
-  border-color: var(--muted);
-  transition:
-    background 0.12s ease,
-    border-color 0.12s ease;
-}
-.cal-cell.has-game:not(.past):hover {
-  background: var(--panel-2);
-  border-color: var(--text);
-}
-.cal-flag {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  font-size: 8px;
-  font-weight: 800;
-  padding: 1px 5px;
-  border-radius: 4px;
-  line-height: 1.4;
-}
-.cal-flag.home,
-.cal-flag.away {
-  color: #fff;
-}
-.cal-opp-big {
-  margin: auto 0;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  line-height: 1.1;
-}
-.cal-books {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  margin-top: auto;
-}
-.cal-book-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  font-size: 9px;
-  line-height: 1.3;
-  padding: 3px 5px;
-  border-radius: 6px;
-  background: var(--book, var(--accent-2));
-  border: 1px solid var(--book, var(--accent-2));
-  color: #fff;
-  white-space: nowrap;
-  font-family: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  transition: filter 0.12s ease;
-}
-.cal-book-link:hover {
-  filter: brightness(1.15);
-}
-.cal-empty {
-  text-align: center;
-  color: var(--muted);
-  font-size: 13px;
-  padding: 20px 0;
-}
-.cal-cell.today {
-  border-color: var(--accent-2);
-  box-shadow: inset 0 0 0 1px var(--accent-2);
-}
-.cal-cell.today .cal-day {
-  color: var(--accent-2);
-  font-weight: 800;
-}
-.cal-cell.past {
-  opacity: 0.45;
-}
-.cal-nav:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-.cal-nav:disabled:hover {
-  background: var(--panel);
-}
-
-/* ---------- 팀 선택 딤 모달 ---------- */
-.modal-dim {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.66);
-  backdrop-filter: blur(2px);
-}
-.modal-card {
-  width: 100%;
-  max-width: 440px;
-  /* 딤 위에 뜨므로 반투명 표면이 아니라 불투명 다크 카드색을 쓴다 */
-  background: #1c1c1c;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 24px;
-}
-.modal-eyebrow {
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 700;
-  margin: 0 0 8px;
-}
-.modal-title {
-  font-size: 22px;
-  margin: 0 0 10px;
-  letter-spacing: -0.5px;
-}
-.modal-sub {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 0 0 20px;
-}
-.modal-sub b {
-  color: var(--text);
-}
-.modal-team-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-}
-.modal-team-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 4px;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background 0.12s ease,
-    box-shadow 0.12s ease;
-}
-.modal-team-cell:hover {
-  background: var(--line);
-  box-shadow: 0 0 0 1px var(--team, var(--accent));
-}
-.modal-team-cell.on {
-  border-color: var(--team, var(--accent));
-  box-shadow: 0 0 0 1px var(--team, var(--accent));
-  background: var(--line);
-}
-.modal-skip {
-  display: block;
-  width: 100%;
-  margin-top: 18px;
-  padding: 11px;
-  background: none;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--muted);
-  font-family: inherit;
-  font-size: 14px;
-  cursor: pointer;
-  transition:
-    color 0.12s ease,
-    border-color 0.12s ease;
-}
-.modal-skip:hover {
-  color: var(--text);
-  border-color: var(--muted);
-}
-
-/* ---------- 상단 링크 바 (직꾸 본체·앱 연결) ---------- */
+/* ============================================================
+   헤더
+   ============================================================ */
 .site-header {
-  margin-bottom: 18px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
 }
+/* 부제를 뺀 대신 브랜드를 크게 세운다. 상단에서 가장 먼저 읽히는 요소 */
 .sf-brand {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 9px;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
-.sf-brand b {
-  font-size: 14px;
-}
-.sf-brand span {
-  font-size: 12px;
-  color: var(--muted);
-}
-.sf-links {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.sf-link {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  padding: 6px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--panel);
+/* 하위 페이지에서만 붙는 화살표. 이게 이 사이트에서 홈으로 가는 유일한 길임을 드러낸다 */
+.sf-arrow {
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--mu);
   transition:
     color 0.12s ease,
-    border-color 0.12s ease,
-    background 0.12s ease;
+    transform 0.12s ease;
 }
-.sf-link:hover {
-  color: var(--text);
-  border-color: var(--muted);
-  background: var(--panel-2);
+.sf-brand.back:hover .sf-arrow {
+  color: var(--fg);
+  transform: translateX(-3px);
 }
-.sf-link.home {
-  color: var(--accent-2);
-  border-color: rgba(198, 233, 0, 0.32);
-  background: rgba(198, 233, 0, 0.12);
-}
-.sf-link.home:hover {
-  border-color: var(--accent-2);
-  background: rgba(198, 233, 0, 0.2);
-}
-
-/* ---------- 캘린더 헤더의 팀 변경 ---------- */
-.cal-title-group {
+/* 밝기 전환 버튼 */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--ln);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  color: var(--mu);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.theme-toggle:hover {
+  color: var(--fg);
+  border-color: var(--ln2);
+}
+
+/* ============================================================
+   서버시계 — 이 화면의 주인공
+   ============================================================ */
+.clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 0 2px;
+}
+.clock-label {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: var(--mu);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  text-align: center;
+}
+/* 상태점 — 동기화·오류·측정중을 색으로만 구분한다 */
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ln2);
+  flex-shrink: 0;
+}
+.dot.synced {
+  background: var(--ok);
+}
+.dot.error {
+  background: var(--seal);
+}
+.dot.loading {
+  background: var(--mu);
+}
+.clock-time {
+  font-size: clamp(52px, 13vw, 92px);
+  font-weight: 200;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+/* 본문 폰트(LaundryGothic)에 등폭 숫자(tnum) 피처가 없어 font-variant-numeric이 먹지 않는다.
+   숫자가 든 칸의 폭을 글자 크기에 비례해 고정해, 매 프레임 좌우로 흔들리지 않게 한다. */
+.clock-time .seg {
+  min-width: 1.4em;
+  text-align: center;
+}
+.clock-time .colon {
+  color: var(--mu);
+}
+.clock-time .ms {
+  font-size: 0.27em;
+  font-weight: 300;
+  color: var(--mu);
+  letter-spacing: 0;
+  /* 위 .seg와 같은 이유로 넉넉히 잡는다. 딱 맞게 주면 넓은 숫자가 올 때 넘쳐 흔들린다 */
+  min-width: 1.9em;
+  text-align: left;
+}
+.clock-note {
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  color: var(--mu);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.clock-host {
+  letter-spacing: 0.06em;
+}
+
+/* 시간 소스 선택 — 칸 없이 밑줄로만 */
+.clock-sources {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.clock-source {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 0 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--mu);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.clock-source:hover {
+  color: var(--fg);
+}
+.clock-source.on {
+  color: var(--fg);
+  font-weight: 600;
+  border-bottom-color: var(--team);
+}
+
+/* ============================================================
+   경기 달력 — 괘선을 없애고 밑줄만 남긴다
+   ============================================================ */
+.cal {
+  display: flex;
+  flex-direction: column;
+}
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cal-title-group {
+  display: flex;
+  align-items: baseline;
   gap: 8px;
+  flex-wrap: wrap;
   min-width: 0;
 }
+.cal-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
 .cal-unset {
-  color: var(--muted);
-  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--mu);
 }
 .cal-change {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--muted);
-  cursor: pointer;
-  font-family: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ln2);
+  padding: 0 0 2px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--mu);
   transition:
     color 0.12s ease,
     border-color 0.12s ease;
 }
 .cal-change:hover {
-  color: var(--text);
-  border-color: var(--muted);
+  color: var(--fg);
+  border-color: var(--fg);
+}
+.cal-nav {
+  background: none;
+  border: 0;
+  padding: 2px 6px;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--mu);
+  transition: color 0.12s ease;
+}
+.cal-nav:hover {
+  color: var(--fg);
+}
+.cal-nav:disabled {
+  color: var(--ln);
+  cursor: default;
+}
+.cal-nav:disabled:hover {
+  color: var(--ln);
 }
 
-/* 좁은 폭: 7열 캘린더 셀이 작아지는 구간(≤600px)에서 셀 요소 축소 + 넘침 방지 */
-@media (max-width: 600px) {
-  .cal-grid,
-  .cal-dow {
-    gap: 4px;
-  }
-  .cal-cell {
-    aspect-ratio: auto;
-    min-height: 62px;
-    padding: 3px;
-    overflow: hidden;
-  }
-  .cal-day {
-    font-size: 10px;
-  }
-  .cal-flag {
-    font-size: 7px;
-    padding: 0 4px;
-  }
-  .cal-opp-big {
-    font-size: 14px;
-  }
-  .cal-book-link {
-    font-size: 8px;
-    padding: 1px 3px;
-  }
+.cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ln);
+}
+.cal-dow span {
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  color: var(--mu);
+  text-align: center;
+}
+.cal-dow .sun,
+.cal-dow .sat {
+  color: var(--ln2);
 }
 
-/* 모바일: 시계 폰트 축소 */
-@media (max-width: 480px) {
-  .clock-time {
-    font-size: 34px;
-  }
-  .clock-time .ms {
-    font-size: 16px;
-    min-width: 28px;
-  }
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
 }
-
-/* ================= 포도알 연습 (/practice) ================= */
-.pr-intro {
-  margin-bottom: 20px;
+/* 높이를 폭에 묶으면 넓은 화면에서 달력만 세로로 길어진다 */
+.cal-cell {
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px 9px;
+  border-bottom: 1px solid var(--ln);
+  text-align: center;
+  min-width: 0;
 }
-/* 연습을 벗어나 메인으로 돌아가는 길. 제목 위에 둬서 진입 즉시 보이게 한다 */
-.pr-back {
-  display: inline-block;
-  margin-bottom: 10px;
-  font-size: 12px;
+.cal-cell.empty {
+  min-height: 76px;
+}
+.cal-day {
+  font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--mu);
+  line-height: 1.2;
+}
+.cal-cell.has-game .cal-day {
+  color: var(--fg);
+}
+.cal-cell.today .cal-day {
+  font-weight: 700;
+  color: var(--fg);
+  border-bottom: 2px solid var(--team);
+  padding-bottom: 1px;
+}
+.cal-cell.past {
+  opacity: 0.42;
+}
+/* 홈경기 표시 — 팀 색 점. 원정은 회색 점.
+   점 크기를 5px 아래로 줄이지 말 것: 팀 색 중 최저(한화 3.00)가 경계라 더 작아지면 안 보인다 */
+.cal-flag {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ln2);
+  font-size: 0;
+  flex-shrink: 0;
+}
+.cal-flag.home {
+  background: var(--team);
+}
+.cal-opp-big {
+  font-size: 15px;
   font-weight: 600;
-  color: var(--muted);
-  padding: 6px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--panel);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* 예매처 — 셀 안에 작은 글자로 둔다. 여기가 이 사이트의 핵심 동선이다 */
+.cal-books {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin-top: auto;
+}
+.cal-book-link {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ln2);
+  padding: 0 1px 1px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--mu);
+  line-height: 1.35;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition:
     color 0.12s ease,
     border-color 0.12s ease;
 }
-.pr-back:hover {
-  color: var(--text);
-  border-color: var(--muted);
+.cal-book-link:hover {
+  color: var(--fg);
+  border-color: var(--team);
+}
+.cal-empty {
+  text-align: center;
+  color: var(--mu);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 22px 0;
+}
+
+/* ============================================================
+   팀 선택 모달
+   ============================================================ */
+.modal-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 10, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  z-index: 50;
+}
+.modal-card {
+  background: var(--bg);
+  border: 1px solid var(--ln2);
+  width: 100%;
+  max-width: 400px;
+  padding: 26px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--shadow);
+}
+.modal-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--mu);
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-align: center;
+  margin: 0;
+}
+.modal-sub {
+  font-size: 13px;
+  color: var(--mu);
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+}
+.modal-sub b {
+  color: var(--fg);
+  font-weight: 600;
+}
+.modal-team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--ln);
+}
+.modal-team-cell {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ln);
+  padding: 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--fg);
+  text-align: left;
+  transition: background 0.12s ease;
+}
+.modal-team-cell::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--team, var(--ln2));
+  flex-shrink: 0;
+}
+.modal-team-cell:hover {
+  background: var(--bg-2);
+}
+.modal-team-cell.on {
+  font-weight: 700;
+}
+.modal-skip {
+  align-self: center;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ln2);
+  padding: 0 0 3px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--mu);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.modal-skip:hover {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+
+/* ============================================================
+   포도알 연습 (/practice)
+   ============================================================ */
+.pr-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 .pr-heading {
-  margin: 0 0 6px;
-  font-size: 24px;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
 }
 .pr-lead {
   margin: 0;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--mu);
+  letter-spacing: 0.02em;
 }
 
+/* 단계 카드 — 테두리 없이 여백으로만 묶는다 */
 .pr-card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 22px 20px;
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding: 8px 0 4px;
   text-align: center;
 }
 .pr-eyebrow {
-  margin: 0 0 10px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-2);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--mu);
+  text-transform: uppercase;
+  margin: 0;
+}
+.pr-eyebrow.fail {
+  color: var(--seal);
 }
 .pr-title {
-  margin: 0 0 6px;
   font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.pr-title-gap {
+  margin-top: 12px;
 }
 .pr-sub {
-  margin: 0 0 18px;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--mu);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 34ch;
+}
+.pr-mission {
+  font-size: 13px;
+  color: var(--mu);
+  margin: 0;
+  letter-spacing: 0.06em;
+}
+.pr-mission b {
+  color: var(--fg);
+  font-weight: 600;
 }
 
-/* ---------- 예매처 선택 ---------- */
-.pr-vendor-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+/* 선택지 — 칸 없이 밑줄로만 표시해 단계가 짧아 보이게 한다 */
+.pr-count-group,
+.pr-level-group,
+.pr-vendor-grid,
+.pr-zone-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 26px;
+  width: 100%;
 }
-.pr-vendor-card {
+.pr-count,
+.pr-level,
+.pr-vendor-card,
+.pr-zone-card {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 0 0 5px;
+  color: var(--mu);
+  font-size: 15px;
+  text-align: center;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.pr-count:hover,
+.pr-level:hover,
+.pr-vendor-card:hover,
+.pr-zone-card:hover {
+  color: var(--fg);
+}
+.pr-count.on,
+.pr-level.on {
+  color: var(--fg);
+  font-weight: 600;
+  border-bottom-color: var(--team);
+}
+
+.pr-level {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 18px 16px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--panel-2);
-  color: var(--text);
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-  transition:
-    border-color 0.12s ease,
-    background 0.12s ease;
+  gap: 2px;
 }
-.pr-vendor-card:hover {
-  border-color: var(--accent-2);
-  background: rgba(198, 233, 0, 0.08);
-}
-.pr-vendor-name {
+.pr-level b {
   font-size: 15px;
+  font-weight: inherit;
 }
-.pr-vendor-point {
+.pr-level span,
+.pr-level small {
   font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-2);
+  color: var(--mu);
+  letter-spacing: 0.02em;
 }
-.pr-vendor-detail {
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--muted);
+.pr-level.on span {
+  color: var(--fg);
 }
 
-/* ---------- 오픈 대기 (남은 시간만 보여준다) ---------- */
+/* 예매처·구역은 설명이 붙으므로 세로로 편다 */
+.pr-vendor-grid,
+.pr-zone-grid {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  border-top: 1px solid var(--ln);
+}
+.pr-vendor-card,
+.pr-zone-card {
+  border-bottom: 1px solid var(--ln);
+  padding: 16px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+.pr-vendor-card:hover,
+.pr-zone-card:hover {
+  border-bottom-color: var(--team);
+}
+.pr-vendor-name,
+.pr-zone-name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+.pr-vendor-point {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--mu);
+}
+.pr-vendor-detail,
+.pr-zone-desc {
+  font-size: 13px;
+  color: var(--mu);
+  line-height: 1.55;
+}
+.pr-zone-card {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pr-zone-left {
+  font-size: 12.5px;
+  color: var(--mu);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- 오픈 대기 — 컨셉 그 자체 ---------- */
 .pr-countdown {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 6px;
-  margin: 4px 0 20px;
+  gap: 4px;
+  padding: 16px 0 6px;
 }
+/* 시계와 같은 이유로 칸 폭을 고정한다. 0.00~9.99가 들어가므로 네 글자 몫을 잡는다.
+   안 잡으면 매 프레임 숫자가 바뀌며 옆의 "초 뒤 열립니다"까지 같이 흔들린다 */
 .pr-countdown-value {
-  font-size: 46px;
-  font-weight: 700;
+  font-size: clamp(58px, 16vw, 84px);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.05em;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 1px;
-  min-width: 118px; /* 숫자가 바뀌어도 좌우로 흔들리지 않게 */
-  text-align: right;
+  min-width: 2.3em;
+  text-align: center;
 }
 .pr-countdown-unit {
-  font-size: 14px;
-  color: var(--muted);
+  font-size: 15px;
+  color: var(--mu);
+  letter-spacing: 0.06em;
 }
+/* 열린 순간에만 팀 색으로 바뀐다 — 큰 글자라 3:1이면 충분하다 */
 .pr-countdown-open {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--accent-2);
+  font-size: clamp(40px, 11vw, 60px);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--team);
 }
-
 .pr-enter {
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 700;
-  font-family: inherit;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.35);
-  cursor: not-allowed;
-  transition:
-    background 0.1s ease,
-    color 0.1s ease,
-    border-color 0.1s ease;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ln);
+  padding: 0 2px 5px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--mu);
+  cursor: default;
 }
 .pr-enter.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  color: var(--fg);
+  font-weight: 600;
+  border-bottom: 2px solid var(--team);
   cursor: pointer;
 }
 .pr-enter.on:hover {
-  filter: brightness(1.12);
+  color: var(--team);
 }
-
 .pr-hint {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
-.pr-hint p {
-  margin: 0 0 8px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-.pr-hint b {
-  color: var(--text);
-}
-.pr-hint p.pr-hint-key {
-  font-size: 12px;
-}
-.pr-hint kbd {
-  display: inline-block;
-  padding: 2px 7px;
-  font-size: 11px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  border: 1px solid var(--line);
-  border-bottom-width: 2px;
-  border-radius: 5px;
-  background: var(--panel-2);
-  color: var(--text);
-}
-.pr-hint p.pr-hint-now {
-  color: var(--accent-2);
-  font-weight: 700;
-}
-
-/* ---------- 구역 선택 ---------- */
-.pr-zone-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.pr-zone-card {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--panel-2);
-  color: var(--text);
-  cursor: pointer;
-  text-align: left;
+  max-width: 34ch;
+}
+.pr-hint p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mu);
+  line-height: 1.65;
+}
+.pr-hint b {
+  color: var(--fg);
+  font-weight: 600;
+}
+.pr-hint p.pr-hint-key {
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+.pr-hint kbd {
   font-family: inherit;
-  transition:
-    border-color 0.12s ease,
-    background 0.12s ease;
+  font-size: 12.5px;
+  border: 1px solid var(--ln2);
+  padding: 1px 5px;
+  color: var(--fg);
 }
-.pr-zone-card:hover {
-  border-color: var(--accent);
-  background: rgba(87, 36, 240, 0.16);
-}
-.pr-zone-name {
-  font-size: 15px;
-}
-.pr-zone-desc {
-  font-size: 12px;
-  color: var(--muted);
-}
-.pr-zone-left {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent-2);
+.pr-hint p.pr-hint-now {
+  color: var(--team);
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
-/* ---------- 좌석(포도알) ---------- */
-/* 실제 예매창처럼 작고 촘촘하게. 폭에 맞춰 늘어나지 않도록 크기를 고정한다 */
-.pr-seat-grid {
-  --seat: 11px;
-  display: grid;
-  grid-template-columns: repeat(var(--cols), var(--seat));
-  gap: 3px;
-  justify-content: center;
-  padding: 14px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.35);
-  overflow-x: auto;
-}
-.pr-seat {
-  width: var(--seat);
-  height: var(--seat);
-  padding: 0;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-.pr-seat.open {
-  background: var(--accent-2);
-}
-.pr-seat.taken {
-  background: rgba(255, 255, 255, 0.13);
-  cursor: not-allowed;
-}
-
-/* ---------- 보안문자 ---------- */
+/* ---------- 보안문자 ----------
+   여기만은 컨셉의 예외다. 비틀린 글자와 잡선이 있어야 실제로 해제하는 감각이 나오므로
+   캔버스는 손대지 않는다 (lib/generateCaptcha.ts). */
 .pr-captcha {
   display: block;
-  margin: 0 auto 14px;
-  border-radius: 10px;
+  max-width: 100%;
+  height: auto;
+  border-top: 1px solid var(--ln2);
+  border-bottom: 1px solid var(--ln2);
 }
 .pr-captcha-form {
   display: flex;
-  gap: 8px;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 260px;
 }
 .pr-captcha-input {
-  flex: 1;
-  max-width: 240px;
-  padding: 12px 14px;
-  font-size: 15px;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--fg);
+  padding: 7px 2px;
   font-family: inherit;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--text);
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: var(--fg);
+}
+.pr-captcha-input::placeholder {
+  color: var(--mu);
+  letter-spacing: 0.14em;
 }
 .pr-captcha-input:focus {
   outline: none;
-  border-color: var(--accent-2);
+  border-bottom-color: var(--team);
+  border-bottom-width: 2px;
 }
 .pr-captcha-input.wrong {
-  border-color: var(--danger);
+  border-bottom-color: var(--seal);
 }
 .pr-captcha-submit {
-  padding: 12px 22px;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: inherit;
-  border-radius: 10px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid var(--team);
+  padding: 0 2px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--fg);
 }
-/* 오류가 없을 때도 자리를 지켜, 문구가 나타났다 사라질 때 화면이 흔들리지 않게 한다.
-   줄 높이를 명시해야 예약 높이(min-height)가 실제 한 줄과 정확히 맞는다 */
+/* 오류가 없을 때도 자리를 지켜 문구가 나타났다 사라질 때 화면이 흔들리지 않게 한다.
+   줄 높이를 명시해야 예약 높이가 실제 한 줄과 정확히 맞는다 */
 .pr-captcha-error {
-  margin: 10px 0 0;
+  margin: 0;
   line-height: 1.4;
   min-height: 1.4em;
-  font-size: 12px;
-  color: var(--danger);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--seal);
+  text-align: center;
 }
 .pr-captcha-refresh {
-  margin-top: 12px;
-  padding: 0;
-  font-size: 12px;
-  font-family: inherit;
-  border: none;
   background: none;
-  color: var(--muted);
-  text-decoration: underline;
-  cursor: pointer;
+  border: 0;
+  border-bottom: 1px solid var(--ln2);
+  padding: 0 0 3px;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  color: var(--mu);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.pr-captcha-refresh:hover {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+
+/* ---------- 좌석판 ---------- */
+/* 줄어드는 좌석 수. 세 자리 몫을 잡아 문장이 흔들리지 않게 한다 */
+.pr-remain {
+  display: inline-block;
+  min-width: 2.4em;
+  text-align: right;
+}
+.pr-pick-status {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.pr-pick-count {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+.pr-pick-hint {
+  font-size: 12px;
+  color: var(--mu);
+  letter-spacing: 0.02em;
+}
+/* 열 수는 구역마다 달라 컴포넌트가 --cols로 넘겨준다 */
+.pr-seat-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 2px;
+  width: 100%;
+}
+/* 좌석은 '남은 자리가 눈에 띄고 팔린 자리는 죽는' 방향이어야 한다.
+   팔린 자리를 채워 칠하면 그쪽이 더 도드라져 정작 눌러야 할 곳을 못 찾는다. */
+.pr-seat {
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 0;
+  min-width: 0;
+  background: none;
+  border: 1px solid transparent;
+}
+/* 남은 자리 — 테두리로 존재를 드러낸다 (배경과 3:1) */
+.pr-seat.open {
+  border-color: var(--ln2);
+}
+/* 팔린 자리 — 배경에 가깝게 눌러 조용히 사라지게 한다 */
+.pr-seat.taken {
+  background: var(--ln);
+  cursor: default;
+}
+.pr-seat.picked {
+  background: var(--team);
+  border-color: var(--team);
 }
 
 /* ---------- 결과 ---------- */
 .pr-total {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4px;
-  margin-bottom: 14px;
 }
 .pr-total-value {
-  font-size: 38px;
-  font-weight: 700;
+  font-size: clamp(48px, 13vw, 66px);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.05em;
   font-variant-numeric: tabular-nums;
-  color: var(--accent-2);
+}
+.pr-total-value.fail {
+  color: var(--mu);
 }
 .pr-total-label {
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  color: var(--mu);
+  text-transform: uppercase;
 }
+/* 신기록 — 작은 글자라 팀 색으로 칠하지 않고 밑줄로 강조한다 */
 .pr-newbest {
-  margin: 0 0 14px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent-2);
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border-bottom: 2px solid var(--team);
+  padding-bottom: 3px;
 }
 .pr-best {
-  margin: 0 0 14px;
-  font-size: 12px;
-  color: var(--muted);
+  margin: 0;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  color: var(--mu);
+  font-variant-numeric: tabular-nums;
 }
 .pr-steps {
   list-style: none;
-  margin: 0 0 18px;
+  margin: 0;
   padding: 0;
-  border-top: 1px solid var(--line);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .pr-steps li {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  padding: 11px 2px;
-  font-size: 13px;
-  border-bottom: 1px solid var(--line);
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--ln);
+  font-size: 13.5px;
 }
 .pr-steps li span {
-  color: var(--muted);
+  color: var(--mu);
+  letter-spacing: 0.02em;
 }
 .pr-steps li b {
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
-/* 실수 횟수는 다음 판에 줄여야 할 값이라 눈에 띄게 둔다 */
+/* 실수 횟수는 의미색(인주). 팀 색은 '내 팀'을 뜻하지 실패를 뜻하지 않는다 */
 .pr-steps li.pr-miss b {
-  color: var(--danger);
-}
-.pr-retry {
-  width: 100%;
-  padding: 14px;
-  font-size: 15px;
-  font-weight: 700;
-  font-family: inherit;
-  border-radius: 12px;
-  border: none;
-  background: var(--accent);
-  color: #fff;
-  cursor: pointer;
-}
-.pr-retry:hover {
-  filter: brightness(1.12);
-}
-.pr-quit {
-  display: block;
-  margin: 0 auto;
-  padding: 8px 16px;
-  font-size: 12px;
-  font-family: inherit;
-  border: none;
-  background: none;
-  color: var(--muted);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-@media (max-width: 640px) {
-  .pr-vendor-grid,
-  .pr-zone-grid {
-    grid-template-columns: 1fr;
-  }
-  .pr-countdown-value {
-    font-size: 38px;
-    min-width: 98px;
-  }
-  /* 모바일은 손가락으로 눌러야 해 좌석을 조금 키운다 */
-  .pr-seat-grid {
-    --seat: 13px;
-    gap: 3px;
-    padding: 10px;
-    justify-content: start;
-  }
-}
-
-/* ---------- 연습: 매수 미션 / 좌석 선택 상태 ---------- */
-.pr-mission {
-  margin: 0 0 14px;
-  padding: 8px 14px;
-  display: inline-block;
-  font-size: 13px;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--panel-2);
-}
-.pr-mission b {
-  color: var(--accent-2);
-}
-
-.pr-pick-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.pr-pick-count {
-  font-size: 15px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent-2);
-}
-.pr-pick-hint {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.pr-seat.picked {
-  background: var(--accent);
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.65) inset;
-}
-
-/* ---------- 연습: 장수 선택 / 실패 결과 ---------- */
-.pr-count-group {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 26px;
-}
-.pr-count {
-  min-width: 62px;
-  padding: 12px 0;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: inherit;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--muted);
-  cursor: pointer;
-  transition:
-    border-color 0.12s ease,
-    background 0.12s ease,
-    color 0.12s ease;
-}
-.pr-count:hover {
-  color: var(--text);
-  border-color: var(--muted);
-}
-.pr-count.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-.pr-title-gap {
-  margin-top: 26px;
-  padding-top: 22px;
-  border-top: 1px solid var(--line);
-}
-
-.pr-eyebrow.fail {
-  color: var(--danger);
-}
-.pr-total-value.fail {
-  color: var(--danger);
+  color: var(--seal);
 }
 .pr-fail-tip {
-  margin: 0 0 18px;
-  padding: 12px 14px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--mu);
+  line-height: 1.65;
+  max-width: 34ch;
+}
+.pr-retry {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid var(--team);
+  padding: 0 2px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--fg);
+  transition: color 0.12s ease;
+}
+.pr-retry:hover {
+  color: var(--team);
+}
+.pr-quit {
+  align-self: center;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ln);
+  padding: 0 0 3px;
   font-size: 12px;
-  line-height: 1.6;
-  text-align: left;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--panel-2);
+  letter-spacing: 0.08em;
+  color: var(--mu);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.pr-quit:hover {
+  color: var(--fg);
+  border-color: var(--ln2);
 }
 
-/* ---------- 연습: 난이도 선택 ---------- */
-.pr-level-group {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 4px;
+/* ============================================================
+   좁은 화면
+   ============================================================ */
+/* 좁은 화면에서도 글자를 줄이지 않는다. 폭이 모자란 건 칸 여백을 깎아 감당한다 —
+   달력 한 칸이 7분의 1이라 글자를 줄이면 가장 먼저 읽어야 할 상대팀부터 안 보인다 */
+@media (max-width: 600px) {
+  .wrap {
+    padding: 26px 16px 60px;
+    gap: 30px;
+  }
+  .cal-cell {
+    min-height: 70px;
+    padding: 8px 1px 9px;
+    gap: 2px;
+  }
+  .cal-book-link {
+    letter-spacing: -0.02em;
+  }
+  .modal-team-grid {
+    grid-template-columns: 1fr;
+  }
 }
-.pr-level {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 12px 10px;
-  font-family: inherit;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--muted);
-  cursor: pointer;
-  transition:
-    border-color 0.12s ease,
-    background 0.12s ease,
-    color 0.12s ease;
-}
-.pr-level:hover {
-  color: var(--text);
-  border-color: var(--muted);
-}
-.pr-level b {
-  font-size: 14px;
-  color: var(--text);
-}
-.pr-level span {
-  font-size: 11px;
-}
-.pr-level small {
-  font-size: 10px;
-  opacity: 0.7;
-}
-.pr-level.on {
-  background: rgba(87, 36, 240, 0.22);
-  border-color: var(--accent);
-  color: var(--text);
+
+@media (max-width: 480px) {
+  .cal-cell {
+    min-height: 66px;
+  }
+  .pr-count-group,
+  .pr-level-group {
+    gap: 18px;
+  }
 }

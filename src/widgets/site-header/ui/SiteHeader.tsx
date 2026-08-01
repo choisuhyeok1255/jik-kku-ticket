@@ -1,36 +1,42 @@
+"use client";
+
 import Link from "next/link";
-import { JIKKKU_HOME_URL } from "@/shared/config/site";
+import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/features/theme";
 
 /**
- * 상단 링크 바.
- * - 이 앱이 "직꾸의 KBO 예매 도우미"임을 알리고, 직꾸 본체 웹으로 잇는다.
- * - 브랜드 영역을 홈 링크로 삼는다.
- * - 눈에 잘 띄도록 화면 최상단에 배치한다.
+ * 상단 바. 브랜드와 밝기 전환만 둔다.
  *
- * 연습 페이지 링크는 좁은 화면에서만 노출한다.
- * 넓은 화면에서는 PracticePromo 카드가 사이드에 고정돼 늘 보이지만, 좁은 화면에서는
- * 그 카드가 본문 맨 아래로 밀려나 스크롤해야 닿기 때문이다(노출 규칙은 globals.css).
+ * 부제를 빼고 브랜드만 크게 세운다. 설명은 배너와 본문이 이미 하고 있어,
+ * 작은 글씨를 덧대면 상단이 복잡해지기만 한다.
+ *
+ * 홈으로 가는 길은 **브랜드 하나뿐**이다. 하위 페이지에서는 브랜드 앞에 화살표를 붙여
+ * "누르면 돌아간다"를 드러내므로, 본문에 따로 뒤로가기 버튼을 두지 않는다.
+ * 현재 위치는 pathname으로 스스로 판단해, 페이지가 아무것도 넘기지 않아도 된다.
+ *
+ * 연습·직관 기록으로 가는 링크는 여기 두지 않는다. 배너 영역이 그 역할을 하고,
+ * 같은 목적지를 두 군데 두면 어느 쪽을 고쳐야 할지 흐려지기 때문이다.
  */
 export default function SiteHeader() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   return (
     <header className="site-header">
-      <Link className="sf-brand" href="/">
-        <b>직꾸 티켓</b>
-        <span>직꾸의 KBO 예매 도우미</span>
+      <Link
+        className={`sf-brand ${isHome ? "" : "back"}`}
+        href="/"
+        aria-label={isHome ? undefined : "홈으로 돌아가기"}
+      >
+        {!isHome && (
+          <span className="sf-arrow" aria-hidden="true">
+            ←
+          </span>
+        )}
+        직꾸 티켓
       </Link>
-      <nav className="sf-links">
-        <Link className="sf-link practice" href="/practice">
-          포도알 연습
-        </Link>
-        <a
-          className="sf-link home"
-          href={JIKKKU_HOME_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          직꾸 홈
-        </a>
-      </nav>
+
+      <ThemeToggle />
     </header>
   );
 }

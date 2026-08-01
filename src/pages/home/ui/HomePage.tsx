@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { TEAMS, TEAM_LIST, useMyTeam } from "@/entities/team";
+import { TEAMS, TEAM_LIST, useMyTeam, teamColorVars } from "@/entities/team";
 import { VendorKey } from "@/shared/config/vendor-keys";
 import { ServerClock, type ClockSource } from "@/features/server-time";
 import { TeamOnboardingModal } from "@/features/pick-team";
@@ -52,9 +52,20 @@ export default function HomePage() {
   const isUnset = !team;
 
   return (
-    <div className="page-layout">
+    /* 응원팀 색을 화면 전체에 흘려보낸다. 점·밑줄·좌석 같은 곳이 이 값을 받아 쓴다 */
+    <div
+      className="page-layout themed"
+      style={teamColorVars(TEAMS[displayTeamId])}
+    >
       <main className="wrap">
         <SiteHeader />
+
+        {/* 좁은 화면에서는 사이드가 없어 배너가 갈 데가 없다. 본문 맨 아래로 내리면
+            스크롤을 끝까지 해야 닿으므로, 헤더 바로 아래로 올려 첫 화면에 둔다 */}
+        <div className="promo-inline">
+          <PracticePromo />
+          <AppPromo />
+        </div>
 
         {/* 저장된 응원팀을 읽는 동안에도 레이아웃 골격은 그대로 둔다
             (로딩 중에만 다른 구조를 쓰면 로드되는 순간 본문이 옆으로 튄다) */}
@@ -75,18 +86,12 @@ export default function HomePage() {
             />
           </>
         )}
-
-        {/* 모바일: 광고 섹션을 main 내부(콘텐츠 흐름) 하단에 둔다 */}
-        <div className="promo-inline">
-          <AppPromo />
-          <PracticePromo />
-        </div>
       </main>
 
-      {/* 데스크탑: 광고 섹션을 콘텐츠 옆 사이드에 둔다 */}
+      {/* 데스크탑: 배너를 콘텐츠 옆 사이드에 고정한다 */}
       <aside className="promo-aside">
-        <AppPromo />
         <PracticePromo />
+        <AppPromo />
       </aside>
 
       {isModalOpen && (

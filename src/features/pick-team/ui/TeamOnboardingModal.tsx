@@ -1,6 +1,6 @@
 "use client";
 
-import { TEAM_LIST } from "@/entities/team";
+import { TEAM_LIST, teamColorVars } from "@/entities/team";
 
 /**
  * 응원 팀 선택/변경 딤 모달.
@@ -43,13 +43,17 @@ export default function TeamOnboardingModal({
 
         <div className="modal-team-grid">
           {TEAM_LIST.map((t) => (
+            /* 각 칸이 자기 구단 색 점을 갖는다 — 목록에서 팀을 색으로도 구분하게 */
             <button
               key={t.id}
               type="button"
-              className={`modal-team-cell ${t.id === currentTeam ? "on" : ""}`}
+              className={`modal-team-cell themed ${
+                t.id === currentTeam ? "on" : ""
+              }`}
+              style={teamColorVars(t)}
               onClick={() => onPick(t.id)}
             >
-              {t.short}
+              {t.name}
             </button>
           ))}
         </div>

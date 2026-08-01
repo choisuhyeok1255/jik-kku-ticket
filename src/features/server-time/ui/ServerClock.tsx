@@ -49,7 +49,30 @@ export default function ServerClock({ activeSource, onSourceChange }: Props) {
     : new URL(VENDORS[activeSource].pingUrl).hostname;
 
   return (
+    /* 라벨 → 시각 → 상태 → 소스 순으로 둔다. 숫자를 화면 가운데 두고
+       나머지를 위아래로 흩어, 시각이 가장 먼저 눈에 들어오게 하기 위함 */
     <div className="clock" data-state={state}>
+      <div className="clock-label">
+        <span>{label}</span>
+        {host && <span className="clock-host">· {host}</span>}
+      </div>
+
+      {/* 시·분·초를 각각 고정폭 칸(seg)에 넣는다. 본문 폰트가 등폭 숫자를 지원하지 않아
+          칸을 안 잡아두면 숫자가 바뀔 때마다 시계 전체가 좌우로 흔들린다 */}
+      <div className="clock-time">
+        <span className="seg">{hh}</span>
+        <span className="colon">:</span>
+        <span className="seg">{mm}</span>
+        <span className="colon">:</span>
+        <span className="seg">{ss}</span>
+        <span className="ms">.{ms}</span>
+      </div>
+
+      <div className="clock-note">
+        <span className={`dot ${state}`} />
+        {getNote(state, isStandard)}
+      </div>
+
       <div className="clock-sources">
         {TABS.map((tab) => (
           <button
@@ -62,23 +85,6 @@ export default function ServerClock({ activeSource, onSourceChange }: Props) {
           </button>
         ))}
       </div>
-
-      <div className="clock-label">
-        <span className={`dot ${state}`} />
-        <span>{label}</span>
-        {host && <span className="clock-host">· {host}</span>}
-      </div>
-
-      <div className="clock-time">
-        <span>{hh}</span>
-        <span className="colon">:</span>
-        <span>{mm}</span>
-        <span className="colon">:</span>
-        <span>{ss}</span>
-        <span className="ms">.{ms}</span>
-      </div>
-
-      <div className="clock-note">{getNote(state, isStandard)}</div>
     </div>
   );
 }

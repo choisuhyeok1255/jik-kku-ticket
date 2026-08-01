@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  TEAMS,
-  TEAM_DB_ID_BY_KEY,
-  TEAM_KEY_BY_DB_ID,
-} from "@/entities/team";
+import { TEAMS, TEAM_DB_ID_BY_KEY, TEAM_KEY_BY_DB_ID } from "@/entities/team";
 import { VENDORS } from "@/entities/vendor";
 import { GameRecordRow, useTeamGameRecordsInMonth } from "@/entities/game";
 import { VendorKey } from "@/shared/config/vendor-keys";
@@ -51,16 +47,21 @@ export default function TeamCalendar({
   });
 
   const now = new Date();
-  const isCurrentMonth =
-    year === now.getFullYear() && month === now.getMonth();
+  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
   const todayDate = now.getDate();
 
   const firstDow = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [
-    ...Array(firstDow).fill(null),
-    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
-  ];
+  const leading: (number | null)[] = Array(firstDow).fill(null);
+  const days: (number | null)[] = Array.from(
+    { length: daysInMonth },
+    (_, i) => i + 1
+  );
+  // 마지막 주를 빈 칸으로 채운다. 안 채우면 칸마다 그은 밑줄이 중간에서 끊겨 보인다
+  const trailing: (number | null)[] = Array(
+    (7 - ((leading.length + days.length) % 7)) % 7
+  ).fill(null);
+  const cells: (number | null)[] = [...leading, ...days, ...trailing];
 
   const goPrev = () => {
     if (isCurrentMonth) return; // 예매 캘린더라 지난 달로는 이동하지 않음
@@ -96,7 +97,12 @@ export default function TeamCalendar({
             {isUnset ? "응원팀 선택" : "변경"}
           </button>
         </div>
-        <button className="cal-nav" type="button" onClick={goNext} aria-label="다음 달">
+        <button
+          className="cal-nav"
+          type="button"
+          onClick={goNext}
+          aria-label="다음 달"
+        >
           ▶
         </button>
       </div>
@@ -111,7 +117,8 @@ export default function TeamCalendar({
 
       <div className="cal-grid">
         {cells.map((day, idx) => {
-          if (day === null) return <div key={`e${idx}`} className="cal-cell empty" />;
+          if (day === null)
+            return <div key={`e${idx}`} className="cal-cell empty" />;
 
           const isToday = isCurrentMonth && day === todayDate;
           const isPast = isCurrentMonth && day < todayDate; // 오늘 이전 = 지난 경기
@@ -132,7 +139,9 @@ export default function TeamCalendar({
           const isHome = game.home_team_id === teamDbId; // 내 팀이 홈경기인지
           const homeTeam = TEAMS[TEAM_KEY_BY_DB_ID[game.home_team_id]];
           const opponent =
-            TEAMS[TEAM_KEY_BY_DB_ID[isHome ? game.away_team_id : game.home_team_id]];
+            TEAMS[
+              TEAM_KEY_BY_DB_ID[isHome ? game.away_team_id : game.home_team_id]
+            ];
 
           return (
             <div
@@ -142,58 +151,57 @@ export default function TeamCalendar({
               }`}
             >
               <span className="cal-day">{day}</span>
-              <span
-                className={`cal-flag ${isHome ? "home" : "away"}`}
-                style={{ background: homeTeam.color }}
-              >
-                {isHome ? "홈" : "원정"}
+              {/* 점 하나로 홈/원정을 가른다. 홈만 응원팀 색이라 예매가 필요한 날이 한눈에 걸린다.
+                  글자는 화면에서 감추되 읽어주는 도구에는 남긴다 */}
+              <span className={`cal-flag ${isHome ? "home" : "away"}`}>
+                <span className="sr-only">
+                  {isHome ? "홈경기" : "원정경기"}
+                </span>
               </span>
               <span className="cal-opp-big">{opponent.short}</span>
               {!isPast && (
                 <div className="cal-books">
-                {homeTeam.vendors.map((tv) => {
-                  const vendor = VENDORS[tv.key];
+                  {homeTeam.vendors.map((tv) => {
+                    const vendor = VENDORS[tv.key];
 
-                  // 예매 링크가 있으면: 예매 사이트 이동(새 탭) + 시계 전환
-                  if (tv.bookingUrl) {
+                    // 예매 링크가 있으면: 예매 사이트 이동(새 탭) + 시계 전환
+                    if (tv.bookingUrl) {
+                      return (
+                        <a
+                          key={tv.key}
+                          className="cal-book-link"
+                          href={tv.bookingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={
+                            vendor.noClock
+                              ? `${homeTeam.name} · ${vendor.name} 예매`
+                              : `${homeTeam.name} · ${vendor.name} 예매 (시계도 전환)`
+                          }
+                          onClick={
+                            vendor.noClock
+                              ? undefined
+                              : () => onPickVendor(tv.key)
+                          }
+                        >
+                          {vendor.shortName}
+                        </a>
+                      );
+                    }
+
+                    // 예매 링크가 아직 없으면: 시계 전환만
                     return (
-                      <a
+                      <button
                         key={tv.key}
+                        type="button"
                         className="cal-book-link"
-                        style={{ ["--book" as string]: homeTeam.color }}
-                        href={tv.bookingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={
-                          vendor.noClock
-                            ? `${homeTeam.name} · ${vendor.name} 예매`
-                            : `${homeTeam.name} · ${vendor.name} 예매 (시계도 전환)`
-                        }
-                        onClick={
-                          vendor.noClock
-                            ? undefined
-                            : () => onPickVendor(tv.key)
-                        }
+                        title={`${vendor.name} 서버시간 보기`}
+                        onClick={() => onPickVendor(tv.key)}
                       >
                         {vendor.shortName}
-                      </a>
+                      </button>
                     );
-                  }
-
-                  // 예매 링크가 아직 없으면: 시계 전환만
-                  return (
-                    <button
-                      key={tv.key}
-                      type="button"
-                      className="cal-book-link"
-                      style={{ ["--book" as string]: homeTeam.color }}
-                      title={`${vendor.name} 서버시간 보기`}
-                      onClick={() => onPickVendor(tv.key)}
-                    >
-                      {vendor.shortName}
-                    </button>
-                  );
-                })}
+                  })}
                 </div>
               )}
             </div>
