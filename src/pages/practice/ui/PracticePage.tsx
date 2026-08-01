@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { SiteHeader } from "@/widgets/site-header";
 import {
   CaptchaInput,
@@ -75,6 +76,11 @@ export default function PracticePage() {
       <SiteHeader />
 
       <div className="pr-intro">
+        {/* 아래 '연습 그만두기'는 이 판을 처음으로 되돌릴 뿐 페이지를 벗어나지 않는다.
+            나가는 길은 위치와 문구를 갈라 헷갈리지 않게 둔다 */}
+        <Link className="pr-back" href="/">
+          ← 홈으로
+        </Link>
         <h1 className="pr-heading">포도알 연습</h1>
         <p className="pr-lead">
           예매 오픈부터 좌석 잡기까지, 실제 절차 그대로 연습해요.

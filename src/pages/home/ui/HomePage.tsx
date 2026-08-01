@@ -9,6 +9,7 @@ import { TeamOnboardingModal } from "@/features/pick-team";
 import { TeamCalendar } from "@/widgets/team-calendar";
 import { SiteHeader } from "@/widgets/site-header";
 import { AppPromo } from "@/widgets/app-promo";
+import { PracticePromo } from "@/widgets/practice-promo";
 
 /**
  * 메인 화면.
@@ -78,12 +79,14 @@ export default function HomePage() {
         {/* 모바일: 광고 섹션을 main 내부(콘텐츠 흐름) 하단에 둔다 */}
         <div className="promo-inline">
           <AppPromo />
+          <PracticePromo />
         </div>
       </main>
 
       {/* 데스크탑: 광고 섹션을 콘텐츠 옆 사이드에 둔다 */}
       <aside className="promo-aside">
         <AppPromo />
+        <PracticePromo />
       </aside>
 
       {isModalOpen && (

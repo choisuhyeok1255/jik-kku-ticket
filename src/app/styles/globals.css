@@ -130,6 +130,21 @@ a {
     background 0.12s ease,
     border-color 0.12s ease;
 }
+/* 포도알 연습 유도 카드 — 앱 프로모 카드 바로 아래에 쌓인다 */
+.practice-promo {
+  margin-top: 12px;
+}
+/* 연습으로 유도하는 단일 버튼이라 카드 폭을 꽉 채워 눌러야 할 곳임을 분명히 한다 */
+.practice-btn {
+  display: block;
+  text-align: center;
+  background: var(--accent);
+  border-color: transparent;
+}
+.practice-btn:hover {
+  background: var(--accent);
+  filter: brightness(1.12);
+}
 .promo-btn:hover {
   background: #111;
   border-color: var(--muted);
@@ -651,6 +666,25 @@ a {
 /* ================= 포도알 연습 (/practice) ================= */
 .pr-intro {
   margin-bottom: 20px;
+}
+/* 연습을 벗어나 메인으로 돌아가는 길. 제목 위에 둬서 진입 즉시 보이게 한다 */
+.pr-back {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.pr-back:hover {
+  color: var(--text);
+  border-color: var(--muted);
 }
 .pr-heading {
   margin: 0 0 6px;
