@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ZoneKind } from "@/entities/stadium";
 import { OPEN_DELAY_MAX_MS, OPEN_DELAY_MIN_MS } from "../config/practice";
 import { calcResult } from "../lib/calcResult";
+import { isFinishedPhase } from "../lib/practicePhase";
 import { clearSession, loadSession, saveSession } from "./practiceSession";
 import { PracticeDifficulty, PracticeSession, PracticeVendor } from "./types";
 
@@ -96,6 +97,8 @@ export function usePracticeRun() {
    */
   const pickSeat = (): number | null => {
     if (!session) return null;
+    // 이미 끝난 판은 결과를 덮어쓰지 않는다
+    if (isFinishedPhase(session.phase)) return null;
 
     const finishedAt = Date.now();
     update({
@@ -110,7 +113,7 @@ export function usePracticeRun() {
   const failSoldOut = () => {
     if (!session) return;
     // 이미 끝난 판은 결과를 덮어쓰지 않는다
-    if (session.phase === "soldout" || session.phase === "done") return;
+    if (isFinishedPhase(session.phase)) return;
 
     update({
       ...session,

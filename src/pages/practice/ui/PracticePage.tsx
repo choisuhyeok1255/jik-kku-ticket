@@ -37,18 +37,21 @@ export default function PracticePage() {
     addMissClick,
     reset,
   } = usePracticeRun();
-  const { best, submitRecord } = useBestRecord();
+  const { getBest, submitRecord } = useBestRecord();
   const [isNewBest, setIsNewBest] = useState(false);
-
-  // 난이도가 다르면 기록을 견줄 수 없으므로 예매처·난이도별로 따로 남긴다
-  const recordKey = session ? `${session.vendor}:${session.difficulty}` : "";
 
   // 고른 장수를 다 잡으면 예매 성공 — 그때의 총 소요 시간으로 기록을 갱신한다
   const handleSeatsComplete = () => {
     const finishedAt = pickSeat();
     if (!session || finishedAt === null) return;
     // 화면에 보이는 소요 시간과 같은 값으로 기록한다 (시각을 다시 재지 않는다)
-    setIsNewBest(submitRecord(recordKey, finishedAt - session.marks.openAt));
+    setIsNewBest(
+      submitRecord(
+        session.vendor,
+        session.difficulty,
+        finishedAt - session.marks.openAt
+      )
+    );
   };
 
   const handleRetry = () => {
@@ -62,7 +65,10 @@ export default function PracticePage() {
     window.alert("이미 선택된 좌석입니다");
   };
 
-  const isFinished = session?.phase === "done" || session?.phase === "soldout";
+  // 결과·실패 화면이 실제로 그려지는 상태인지.
+  // 렌더 조건과 '그만두기' 버튼 조건이 같은 값을 보게 해, 한쪽만 바뀌어 어긋나는 일을 막는다
+  const showsResult = session?.phase === "done" && result !== null;
+  const showsSummary = showsResult || session?.phase === "soldout";
 
   return (
     <main className="wrap">
@@ -107,12 +113,12 @@ export default function PracticePage() {
         />
       )}
 
-      {session?.phase === "done" && result && (
+      {showsResult && (
         <ResultSummary
           vendor={session.vendor}
           result={result}
           ticketCount={session.ticketCount}
-          bestMs={best[recordKey]}
+          bestMs={getBest(session.vendor, session.difficulty)}
           isNewBest={isNewBest}
           onRetry={handleRetry}
         />
@@ -127,7 +133,9 @@ export default function PracticePage() {
         />
       )}
 
-      {session && !isFinished && (
+      {/* 결과 화면에는 '다시 연습하기'가 있으니 그때만 감춘다.
+          끝난 상태인데 결과를 못 그리는 경우에도 빠져나갈 길은 남겨둔다 */}
+      {session && !showsSummary && (
         <button type="button" className="pr-quit" onClick={handleRetry}>
           연습 그만두기
         </button>

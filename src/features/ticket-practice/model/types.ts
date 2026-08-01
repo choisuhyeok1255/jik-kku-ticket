@@ -1,4 +1,5 @@
 import { ZoneKind } from "@/entities/stadium";
+import { DIFFICULTIES } from "../config/practice";
 
 /**
  * 티켓팅 연습의 진행 상태 타입.
@@ -7,20 +8,23 @@ import { ZoneKind } from "@/entities/stadium";
  */
 
 /**
- * 값 목록과 타입을 함께 둔다.
+ * 값 목록에서 타입을 파생시킨다.
  * 저장된 세션을 복원할 때 "이 값이 지금도 유효한가"를 실행 중에 확인해야 하는데,
  * 타입만 있으면 그 검사를 할 수 없기 때문이다. (타입은 빌드 후 사라진다)
+ * 목록과 타입을 따로 적으면 한쪽만 바뀌어 어긋나므로 항상 목록을 원본으로 삼는다.
  */
 
 /** 연습 대상 예매처. 진입 방식이 서로 다르다 */
 export const PRACTICE_VENDORS = ["ticketlink", "nol"] as const;
 export type PracticeVendor = (typeof PRACTICE_VENDORS)[number];
 
-/** 좌석이 얼마나 빨리 나가는지 (= 얼마나 서둘러야 하는지) */
-export type PracticeDifficulty = "easy" | "normal" | "hard";
+/**
+ * 좌석이 얼마나 빨리 나가는지 (= 얼마나 서둘러야 하는지).
+ * 난이도 정의(DIFFICULTIES)가 곧 유효값이므로 그 키에서 직접 파생시킨다.
+ */
+export type PracticeDifficulty = keyof typeof DIFFICULTIES;
 
 export const PRACTICE_PHASES = [
-  "idle", // 시작 전
   "waiting", // 오픈 대기 (예매 버튼 누르기 전)
   "zone", // 구역 선택
   "captcha", // 보안문자 입력

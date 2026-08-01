@@ -47,14 +47,6 @@ export default function HomePage() {
     setIsModalOpen(false);
   };
 
-  if (!loaded) {
-    return (
-      <main className="wrap">
-        <p className="loading-line">불러오는 중…</p>
-      </main>
-    );
-  }
-
   const displayTeamId = team ?? TEAM_LIST[0].id; // 미설정이면 첫 팀 기준으로 표시
   const isUnset = !team;
 
@@ -63,17 +55,25 @@ export default function HomePage() {
       <main className="wrap">
         <SiteHeader />
 
-        <ServerClock
-          activeSource={activeSource}
-          onSourceChange={handleSourceChange}
-        />
+        {/* 저장된 응원팀을 읽는 동안에도 레이아웃 골격은 그대로 둔다
+            (로딩 중에만 다른 구조를 쓰면 로드되는 순간 본문이 옆으로 튄다) */}
+        {!loaded && <p className="loading-line">불러오는 중…</p>}
 
-        <TeamCalendar
-          teamId={displayTeamId}
-          onPickVendor={handlePickVendor}
-          onChangeTeam={() => setIsModalOpen(true)}
-          isUnset={isUnset}
-        />
+        {loaded && (
+          <>
+            <ServerClock
+              activeSource={activeSource}
+              onSourceChange={handleSourceChange}
+            />
+
+            <TeamCalendar
+              teamId={displayTeamId}
+              onPickVendor={handlePickVendor}
+              onChangeTeam={() => setIsModalOpen(true)}
+              isUnset={isUnset}
+            />
+          </>
+        )}
 
         {/* 모바일: 광고 섹션을 main 내부(콘텐츠 흐름) 하단에 둔다 */}
         <div className="promo-inline">

@@ -5,6 +5,7 @@ import {
   DEFAULT_DIFFICULTY,
   DEFAULT_TICKET_COUNT,
   DIFFICULTIES,
+  DIFFICULTY_KEYS,
   TICKET_COUNT_OPTIONS,
 } from "../config/practice";
 import { PracticeDifficulty, PracticeVendor } from "../model/types";
@@ -22,8 +23,6 @@ interface Props {
     difficulty: PracticeDifficulty
   ) => void;
 }
-
-const DIFFICULTY_KEYS = Object.keys(DIFFICULTIES) as PracticeDifficulty[];
 
 const VENDOR_GUIDE: {
   key: PracticeVendor;

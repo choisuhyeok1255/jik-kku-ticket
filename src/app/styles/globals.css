@@ -9,7 +9,9 @@
   --accent: #5724f0;
   --accent-2: #c6e900;
   --surface-deep: #0a0a0a;
-  --danger: #ff8080; /* 실패·오류를 알리는 색 */
+  /* 실패·오류를 알리는 텍스트·테두리 색.
+     서버시계 상태점(.dot)은 초록/노랑/빨강 신호등 세트로 따로 관리한다 */
+  --danger: #ff8080;
 }
 
 * {
@@ -27,9 +29,28 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 스크롤바가 생겼다 사라질 때 본문이 좌우로 밀리지 않게 자리를 미리 잡아둔다 */
+html {
+  scrollbar-gutter: stable;
+}
+
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* ---------- 접근성 유틸 ---------- */
+/* 눈으로는 보이지 않지만 화면을 읽어주는 도구에는 전달되는 텍스트 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .wrap {
@@ -48,6 +69,9 @@ a {
 .page-layout .wrap {
   margin: 0; /* flex 안에서는 auto 여백을 쓰지 않는다 (프로모가 밀려나는 문제) */
   flex-shrink: 1;
+  /* 폭을 콘텐츠 양에 맡기면, 불러오는 동안 본문이 좁아졌다가
+     내용이 채워질 때 옆으로 튀어 보인다. max-width 안에서 폭을 고정한다 */
+  width: 100%;
 }
 .promo-aside {
   position: sticky;
@@ -109,11 +133,9 @@ a {
   }
 }
 
-/* 좁은 화면: main 내부 광고 사용, 사이드 광고 숨김 (본문과 자동 동일 폭) */
+/* 좁은 화면: main 내부 광고 사용, 사이드 광고 숨김 (본문과 자동 동일 폭)
+   본문 정렬은 .page-layout의 justify-content: center가 그대로 처리하므로 따로 손대지 않는다 */
 @media (max-width: 1080px) {
-  .page-layout .wrap {
-    margin: 0 auto;
-  }
   .promo-aside {
     display: none;
   }
@@ -186,6 +208,8 @@ a {
   gap: 4px 6px;
   margin-bottom: 8px;
 }
+/* 서버시계 상태점. 회색·초록·노랑·빨강이 한 세트로 읽히는 신호등이라
+   --danger 같은 의미 색과 섞지 않고 여기서 따로 관리한다 */
 .dot {
   width: 8px;
   height: 8px;
@@ -1041,8 +1065,12 @@ a {
   color: #fff;
   cursor: pointer;
 }
+/* 오류가 없을 때도 자리를 지켜, 문구가 나타났다 사라질 때 화면이 흔들리지 않게 한다.
+   줄 높이를 명시해야 예약 높이(min-height)가 실제 한 줄과 정확히 맞는다 */
 .pr-captcha-error {
   margin: 10px 0 0;
+  line-height: 1.4;
+  min-height: 1.4em;
   font-size: 12px;
   color: var(--danger);
 }

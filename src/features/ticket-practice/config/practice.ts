@@ -30,6 +30,17 @@ export const DIFFICULTIES = {
   hard: { label: "어려움", durationMs: 25000, hint: "인기 경기처럼" },
 } as const;
 
+/**
+ * 난이도 목록(정의 순서 = 쉬움 → 어려움).
+ *
+ * 손으로 다시 나열하지 않고 정의에서 그대로 뽑는다. 목록을 따로 적으면 난이도를 추가할 때
+ * 한쪽만 고쳐 어긋나는데, 타입 검사로는 '누락'을 잡을 수 없어 조용히 빠지기 때문이다.
+ * (Object.keys의 반환 타입이 string[]이라 단언이 필요하지만, 값은 정확히 이 객체의 키다)
+ */
+export const DIFFICULTY_KEYS = Object.keys(
+  DIFFICULTIES
+) as readonly (keyof typeof DIFFICULTIES)[];
+
 export const DEFAULT_DIFFICULTY = "normal";
 
 /** 보안문자 길이 */
