@@ -8,7 +8,4 @@
  *
  * 서버 컴포넌트·라우트 핸들러에서만 import한다.
  */
-export {
-  getVendorServerTime,
-  type ServerTimeResult,
-} from "./api/vendorServerTime";
+export { getVendorServerTime } from "./api/vendorServerTime";

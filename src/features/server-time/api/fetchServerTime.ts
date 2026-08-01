@@ -9,7 +9,7 @@ import { apiClient } from "@/shared/api/apiClient";
 // 예매처를 새로 측정하는 응답은 수 초 걸릴 수 있어 넉넉히 잡되, 무한정 기다리지는 않는다
 const REQUEST_TIMEOUT_MS = 15_000;
 
-export interface ServerTimeResponse {
+interface ServerTimeResponse {
   ok: boolean;
   source: string; // "standard" 또는 예매처 key
   receivedAt: number; // 서버가 요청을 받은 시각(소스 시각 기준, ms)

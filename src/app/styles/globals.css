@@ -8,7 +8,6 @@
   --muted: rgba(255, 255, 255, 0.78);
   --accent: #5724f0;
   --accent-2: #c6e900;
-  --surface-deep: #0a0a0a;
   /* 실패·오류를 알리는 텍스트·테두리 색.
      서버시계 상태점(.dot)은 초록/노랑/빨강 신호등 세트로 따로 관리한다 */
   --danger: #ff8080;
@@ -151,54 +150,6 @@ a {
   }
 }
 
-/* ---------- header ---------- */
-.head h1 {
-  font-size: 26px;
-  margin: 0 0 8px;
-  letter-spacing: -0.5px;
-}
-.head .ball {
-  margin-right: 4px;
-}
-.head .sub {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* ---------- hero (선택 경기) ---------- */
-.hero {
-  margin-top: 24px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--home, var(--accent));
-  border-radius: 16px;
-  padding: 22px;
-}
-.hero-match .teams {
-  font-size: 20px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.hero-match .at {
-  color: var(--muted);
-  font-weight: 400;
-}
-.hero-match .meta {
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 13px;
-}
-.hero-match .open {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
 /* ---------- server clock ---------- */
 .clock {
   margin: 20px 0;
@@ -271,132 +222,6 @@ a {
 }
 .clock-host {
   font-family: "SF Mono", "Menlo", "Consolas", monospace;
-}
-
-/* ---------- actions ---------- */
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.vendor-badge {
-  font-size: 13px;
-  color: var(--muted);
-  padding: 8px 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-.vendor-badge b {
-  color: var(--text);
-}
-.go {
-  flex: 1;
-  min-width: 200px;
-  text-align: center;
-  padding: 13px 18px;
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
-  font-size: 15px;
-  border-radius: 10px;
-  transition:
-    transform 0.08s ease,
-    filter 0.15s ease;
-}
-.go:hover {
-  filter: brightness(1.1);
-}
-.go:active {
-  transform: scale(0.98);
-}
-
-/* ---------- game list ---------- */
-.list {
-  margin-top: 32px;
-}
-.list h2 {
-  font-size: 15px;
-  color: var(--muted);
-  font-weight: 600;
-  margin: 0 0 12px;
-}
-.games {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-.game {
-  text-align: left;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--home, var(--line));
-  border-radius: 12px;
-  padding: 14px;
-  cursor: pointer;
-  color: var(--text);
-  font-family: inherit;
-  transition:
-    background 0.12s ease,
-    border-color 0.12s ease;
-}
-.game:hover {
-  background: var(--panel-2);
-}
-.game.active {
-  border-color: var(--home, var(--accent));
-  background: var(--panel-2);
-  box-shadow: 0 0 0 1px var(--home, var(--accent));
-}
-.g-date {
-  font-size: 12px;
-  color: var(--muted);
-}
-.g-match {
-  font-size: 17px;
-  font-weight: 700;
-  margin: 4px 0 8px;
-}
-.g-at {
-  color: var(--muted);
-  font-weight: 400;
-  font-size: 14px;
-}
-.g-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-}
-.g-stadium {
-  color: var(--muted);
-}
-.g-vendor {
-  color: var(--text);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-/* ---------- footer ---------- */
-.foot {
-  margin-top: 32px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
-.foot p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-  margin: 0;
-}
-.foot code {
-  background: var(--panel-2);
-  padding: 1px 6px;
-  border-radius: 5px;
-  font-size: 11px;
 }
 
 .loading-line {
@@ -814,9 +639,6 @@ a {
 
 /* 모바일: 시계 폰트 축소 */
 @media (max-width: 480px) {
-  .games {
-    grid-template-columns: 1fr;
-  }
   .clock-time {
     font-size: 34px;
   }

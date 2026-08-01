@@ -8,8 +8,3 @@ export { default as ResultSummary } from "./ui/ResultSummary";
 export { default as SoldOutSummary } from "./ui/SoldOutSummary";
 export { usePracticeRun } from "./model/usePracticeRun";
 export { useBestRecord } from "./model/useBestRecord";
-export type {
-  PracticeVendor,
-  PracticePhase,
-  PracticeResult,
-} from "./model/types";

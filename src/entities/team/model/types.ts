@@ -4,7 +4,7 @@ import { VendorKey } from "@/shared/config/vendor-keys";
  * 팀의 예매처 항목 — 예매처 키 + 그 팀 전용 예매 링크.
  * - 같은 예매처(예: 티켓링크)라도 구단별로 예매 페이지가 달라 링크를 팀에 둔다.
  */
-export interface TeamVendor {
+interface TeamVendor {
   key: VendorKey;
   bookingUrl: string; // 이 팀의 이 예매처 예매 링크 (없으면 빈 문자열)
 }
