@@ -6,6 +6,10 @@ import { Zone } from "@/entities/stadium";
  * 실제 예매창의 함정은 여기에 있다 — 남이 자리를 잡아도 **내 화면은 그대로다.**
  * 빈자리로 보여서 눌렀는데 그제서야 "이미 선택된 좌석"이라는 알림을 받고 시간을 날린다.
  * 그래서 '남이 선점했다(reserved)'와 '내 화면에 팔린 것으로 보인다(taken)'를 따로 둔다.
+ *
+ * 좌석은 붙어 있지 않아도 고를 수 있다. 다만 배치를 만들 때 **붙은 자리를 고를 선택지가
+ * 최소 하나는 있도록 보장**한다. 무작위로 흩뿌리기만 하면 두 장을 예매하러 들어왔는데
+ * 나란한 자리가 한 곳도 없는 판이 나올 수 있기 때문이다.
  */
 
 export interface Seat {
@@ -24,16 +28,29 @@ export interface Seat {
 const isTrulyOpen = (seat: Seat): boolean =>
   !seat.taken && !seat.reserved && !seat.picked;
 
-/** 팔린 자리 중 무작위로 골라 필요한 수만큼 비운다 */
-function openMoreSeats(seats: Seat[], shortage: number): void {
-  const takenIndexes = seats
-    .map((seat, index) => (seat.taken ? index : -1))
-    .filter((index) => index >= 0);
+/** 무작위로 n개를 뽑아 돌려준다 (원본은 건드리지 않는다) */
+function sample<T>(items: T[], n: number): T[] {
+  const pool = [...items];
+  const out: T[] = [];
+  for (let i = 0; i < n && pool.length > 0; i++) {
+    out.push(...pool.splice(Math.floor(Math.random() * pool.length), 1));
+  }
+  return out;
+}
 
-  for (let i = 0; i < shortage && takenIndexes.length > 0; i++) {
-    const pick = Math.floor(Math.random() * takenIndexes.length);
-    seats[takenIndexes[pick]].taken = false;
-    takenIndexes.splice(pick, 1);
+/**
+ * 한 줄에 나란히 붙은 자리를 그 자리에서 고를 수 있게 만든다.
+ *
+ * 이미 팔린 자리든 남이 선점한 자리든 가리지 않고 되돌려, 나란한 선택지가 반드시 생기게 한다.
+ */
+function carveRun(seats: Seat[], zone: Zone, runLength: number): void {
+  const row = Math.floor(Math.random() * zone.rows);
+  const startCol = Math.floor(Math.random() * (zone.cols - runLength + 1));
+
+  for (let i = 0; i < runLength; i++) {
+    const seat = seats[row * zone.cols + startCol + i];
+    seat.taken = false;
+    seat.reserved = false;
   }
 }
 
@@ -41,10 +58,16 @@ function openMoreSeats(seats: Seat[], shortage: number): void {
  * 좌석 목록을 생성한다.
  *
  * @param zone 대상 구역 (배치 크기와 매진율을 갖는다)
- * @param requiredSeats 잡아야 하는 매수. 최소 이만큼의 빈자리가 보장된다
+ * @param requiredSeats 잡아야 하는 매수. 이만큼 나란히 붙은 자리가 최소 한 곳은 보장된다
+ *                      (붙은 자리로 잡아야 하는 건 아니고, 고르려면 고를 수 있게 두는 것)
+ * @param preTakenRate 열리자마자 이미 남이 잡고 있는 빈자리의 비율 (0~1)
  * @returns 행 우선 순서로 나열된 좌석 목록
  */
-export function generateSeats(zone: Zone, requiredSeats: number): Seat[] {
+export function generateSeats(
+  zone: Zone,
+  requiredSeats: number,
+  preTakenRate = 0
+): Seat[] {
   const seats: Seat[] = [];
 
   for (let row = 0; row < zone.rows; row++) {
@@ -67,7 +90,20 @@ export function generateSeats(zone: Zone, requiredSeats: number): Seat[] {
     requiredSeats,
     Math.round(total * (1 - zone.soldOutRate))
   );
-  openMoreSeats(seats, openCount);
+  sample(seats, openCount).forEach((seat) => {
+    seat.taken = false;
+  });
+
+  // 화면에는 빈자리로 보이지만 이미 남이 잡은 자리를 미리 깔아둔다
+  const open = seats.filter((seat) => !seat.taken);
+  sample(open, Math.round(open.length * preTakenRate)).forEach((seat) => {
+    seat.reserved = true;
+  });
+
+  // 붙어 있는 자리가 하나도 없으면 시작부터 성공이 불가능하므로 한 줄을 뚫어준다
+  if (requiredSeats > 1 && !hasAdjacentRun(seats, zone, requiredSeats)) {
+    carveRun(seats, zone, requiredSeats);
+  }
 
   return seats;
 }
@@ -100,13 +136,7 @@ export function reserveSomeSeats(seats: Seat[], perTick: number): Seat[] {
   const count = Math.min(available.length, stochasticCount(perTick));
   if (count === 0) return seats;
 
-  const reservedIds = new Set<string>();
-  const pool = [...available];
-  for (let i = 0; i < count; i++) {
-    const pick = Math.floor(Math.random() * pool.length);
-    reservedIds.add(pool[pick].id);
-    pool.splice(pick, 1);
-  }
+  const reservedIds = new Set(sample(available, count).map((seat) => seat.id));
 
   return seats.map((seat) =>
     reservedIds.has(seat.id) ? { ...seat, reserved: true } : seat
@@ -116,3 +146,24 @@ export function reserveSomeSeats(seats: Seat[], perTick: number): Seat[] {
 /** 지금 고를 수 있는 자리 수 (화면에 빈자리로 보이고 남이 선점하지도 않은) */
 export const countSelectable = (seats: Seat[]): number =>
   seats.filter(isTrulyOpen).length;
+
+/**
+ * 한 줄에 `length`개가 나란히 붙어 고를 수 있는 곳이 있는지.
+ * 여러 장을 잡아야 할 때 이게 없으면 자리가 남아 있어도 예매를 끝낼 수 없다.
+ */
+export function hasAdjacentRun(
+  seats: Seat[],
+  zone: Zone,
+  length: number
+): boolean {
+  if (length <= 1) return countSelectable(seats) >= length;
+
+  for (let row = 0; row < zone.rows; row++) {
+    let run = 0;
+    for (let col = 0; col < zone.cols; col++) {
+      run = isTrulyOpen(seats[row * zone.cols + col]) ? run + 1 : 0;
+      if (run >= length) return true;
+    }
+  }
+  return false;
+}

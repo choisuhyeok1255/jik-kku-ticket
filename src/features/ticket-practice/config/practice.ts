@@ -14,20 +14,42 @@ export const TICKET_COUNT_OPTIONS = [1, 2, 3, 4] as const;
 export const DEFAULT_TICKET_COUNT = 2;
 
 /** 좌석이 팔려나가는 것을 화면에 반영하는 주기 */
-export const SELLOUT_INTERVAL_MS = 800;
+export const SELLOUT_INTERVAL_MS = 400;
 
 /**
- * 난이도 = 그 구역의 빈자리가 모두 나가기까지 걸리는 시간.
+ * 난이도.
  *
- * '남은 자리의 몇 %'로 깎으면 구역 크기에 따라 난이도가 7배까지 벌어진다
- * (빈자리가 적은 테이블석은 순식간에, 외야는 한참 버틴다).
- * 그래서 '처음 빈자리를 정해진 시간에 걸쳐 소진'하는 방식으로 두어,
- * 어느 구역을 골라도 체감 난이도가 같게 만든다.
+ * - `durationMs` — 그 구역의 빈자리가 모두 나가기까지 걸리는 시간.
+ *   '남은 자리의 몇 %'로 깎으면 구역 크기에 따라 난이도가 7배까지 벌어지므로
+ *   ('빈자리가 적은 테이블석은 순식간에, 외야는 한참 버틴다),
+ *   '처음 빈자리를 정해진 시간에 걸쳐 소진'하는 방식으로 두어 구역과 무관하게 맞춘다.
+ *
+ * - `preTakenRate` — 좌석표가 열린 그 순간 이미 남이 잡고 있는 빈자리의 비율.
+ *   0으로 두면 처음 몇 초는 아무 자리나 눌러도 성공해서, 실제 예매의 핵심인
+ *   '눌러봐야 이미 나갔음을 아는' 함정을 만나지 못한다.
+ *
+ * 예전에는 가장 어려운 난이도도 25초여서, 좌석 두 개 고르는 데 1~3초면 끝나는 것과
+ * 견주면 시간이 8배 남았다. 실패가 사실상 불가능해 지금 값으로 줄였다.
  */
 export const DIFFICULTIES = {
-  easy: { label: "쉬움", durationMs: 45000, hint: "여유 있게 익히기" },
-  normal: { label: "보통", durationMs: 35000, hint: "실전과 비슷하게" },
-  hard: { label: "어려움", durationMs: 25000, hint: "인기 경기처럼" },
+  easy: {
+    label: "쉬움",
+    durationMs: 25000,
+    preTakenRate: 0.1,
+    hint: "여유 있게 익히기",
+  },
+  normal: {
+    label: "보통",
+    durationMs: 15000,
+    preTakenRate: 0.25,
+    hint: "실전과 비슷하게",
+  },
+  hard: {
+    label: "어려움",
+    durationMs: 8000,
+    preTakenRate: 0.4,
+    hint: "인기 경기처럼",
+  },
 } as const;
 
 /**

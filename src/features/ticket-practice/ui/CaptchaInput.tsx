@@ -8,6 +8,7 @@ import { drawCaptcha, generateCaptchaText } from "../lib/generateCaptcha";
  *
  * 캔버스에 글자를 비틀어 그려, 실제 예매의 보안문자처럼 눈으로 읽어 입력하게 한다.
  * 틀리면 새 문자를 다시 뽑는다(실전과 동일). 여기서 지체하면 좋은 자리가 먼저 나간다.
+ * 보안문자가 대문자로만 이뤄지므로 입력도 대문자로 맞춰 보여준다.
  *
  * 연습용이라 정답을 숨길 이유가 없으므로, 화면을 읽어주는 도구에는 문자를 그대로 전해
  * 눈으로 읽지 않아도 진행할 수 있게 한다. 다만 눈으로 보는 사람에게는 답이 노출되지 않도록
@@ -46,7 +47,8 @@ export default function CaptchaInput({ onSolved }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim().toUpperCase() === answer) {
+    // 입력 시점에 이미 대문자로 맞춰뒀으므로 여기서는 그대로 견준다
+    if (input.trim() === answer) {
       onSolved();
       return;
     }
@@ -55,8 +57,13 @@ export default function CaptchaInput({ onSolved }: Props) {
     setIsWrong(true);
   };
 
+  /**
+   * 보안문자가 대문자로만 이뤄져 있으므로 입력도 대문자로 맞춘다.
+   * 눌린 그대로 두면 소문자로 보이는데 정답은 대문자라, 맞게 쳤는데 틀린 것처럼 읽힌다.
+   * 붙여넣기·자동완성으로 들어오는 값까지 한 곳에서 걸러진다.
+   */
   const handleInputChange = (value: string) => {
-    setInput(value);
+    setInput(value.toUpperCase());
     setIsWrong(false);
   };
 
@@ -86,6 +93,9 @@ export default function CaptchaInput({ onSolved }: Props) {
           autoFocus
           autoComplete="off"
           spellCheck={false}
+          // 모바일 키보드를 대문자·영문 상태로 열어 손이 덜 가게 한다
+          autoCapitalize="characters"
+          inputMode="text"
           aria-label="보안문자 입력"
           aria-invalid={isWrong}
           // 나중에 입력으로 돌아와도 "왜 잘못됐는지"를 다시 들을 수 있게 오류 문구와 묶는다

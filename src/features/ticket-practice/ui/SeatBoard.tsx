@@ -15,7 +15,8 @@ import { PracticeDifficulty } from "../model/types";
  * 좌석(포도알) 격자 화면.
  *
  * 실제 예매창처럼 대부분은 이미 팔려 있고 일부만 빈자리다. 그중 **잡아야 할 매수만큼**
- * 빠르게 골라야 예매가 끝난다. 붙어 있는 자리인지는 따지지 않는다.
+ * 빠르게 골라야 예매가 끝난다. 붙어 있는 자리인지는 따지지 않는다 — 다만 좌석표에는
+ * 붙은 자리를 고를 선택지가 늘 있도록 배치가 보장된다(generateSeats 참고).
  *
  * 좌석표를 보는 동안에도 남들이 계속 자리를 채가는데, **내 화면은 그대로다.**
  * 빈자리로 보여서 눌렀는데 그제서야 이미 나간 자리임을 알게 되는 것 —
@@ -48,22 +49,46 @@ export default function SeatBoard({
   // 처음 빈자리 수를 함께 붙잡아둔다 — 소진 속도를 이 값 기준으로 정해야
   // 구역 크기와 상관없이 난이도가 같아진다
   const [board] = useState(() => {
-    const initial = generateSeats(zone, ticketCount);
-    return { initial, openCount: countSelectable(initial) };
+    const initial = generateSeats(
+      zone,
+      ticketCount,
+      DIFFICULTIES[difficulty].preTakenRate
+    );
+    return {
+      initial,
+      openCount: countSelectable(initial),
+      startedAt: Date.now(),
+    };
   });
   const [seats, setSeats] = useState<Seat[]>(board.initial);
 
   useEffect(() => {
-    const perTick =
-      (board.openCount * SELLOUT_INTERVAL_MS) /
-      DIFFICULTIES[difficulty].durationMs;
+    const { durationMs } = DIFFICULTIES[difficulty];
+    let sold = 0;
 
-    const letOthersTakeSeats = () => {
-      setSeats((prev) => reserveSomeSeats(prev, perTick));
+    /**
+     * 흐른 시간만큼 자리를 채간다.
+     *
+     * 틱마다 고정된 수를 빼면 `window.alert`이 떠 있는 동안 타이머가 멈춰,
+     * 헛클릭을 해도 시간 손해가 없어진다(오히려 알림을 열어두는 게 이득이 된다).
+     * 그래서 '지금까지 몇 석이 나갔어야 하는가'를 시각으로 계산해 밀린 만큼 몰아서 뺀다.
+     */
+    const sellByElapsed = () => {
+      const elapsed = Date.now() - board.startedAt;
+      const shouldBeSold = Math.min(
+        board.openCount,
+        (board.openCount * elapsed) / durationMs
+      );
+      const behind = shouldBeSold - sold;
+      if (behind <= 0) return;
+
+      sold = shouldBeSold;
+      setSeats((prev) => reserveSomeSeats(prev, behind));
     };
-    const timer = setInterval(letOthersTakeSeats, SELLOUT_INTERVAL_MS);
+
+    const timer = setInterval(sellByElapsed, SELLOUT_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [board.openCount, difficulty]);
+  }, [board.openCount, board.startedAt, difficulty]);
 
   const pickedCount = seats.filter((seat) => seat.picked).length;
   // 남은 자리로는 원하는 매수를 채울 수 없다 = 예매 실패
@@ -106,8 +131,11 @@ export default function SeatBoard({
   return (
     <section className="pr-card">
       <h2 className="pr-title">{zone.name}</h2>
+      {/* 남은 좌석은 0.8초마다 줄어든다. 숫자 칸을 고정하지 않으면 자릿수가 바뀔 때마다
+          가운데 정렬된 문장 전체가 좌우로 움직인다 */}
       <p className="pr-sub">
-        {ticketCount}자리를 잡으세요 · 남은 좌석 {remaining}석
+        {ticketCount}자리를 잡으세요 · 남은 좌석{" "}
+        <span className="pr-remain">{remaining}</span>석
       </p>
 
       <div className="pr-pick-status">
