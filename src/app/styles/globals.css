@@ -646,6 +646,66 @@ button {
 }
 
 /* ============================================================
+   구단별 예매처 목록 — 캘린더 아래의 참고 목록.
+   본문의 주인공은 시계와 캘린더이므로 여기서는 소리를 낮춘다.
+   제목·구단명만 읽히는 밝기로 두고, 나머지는 선으로만 구분한다.
+   ============================================================ */
+.vendor-dir {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.vendor-dir-title {
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: var(--mu);
+  margin: 0;
+}
+.vendor-dir-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ln);
+}
+.vendor-dir-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--ln);
+}
+.vendor-dir-team {
+  font-size: 13.5px;
+  color: var(--fg);
+}
+.vendor-dir-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 13px;
+}
+.vendor-dir-link {
+  color: var(--mu);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ln2);
+  padding-bottom: 1px;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.vendor-dir-link:hover {
+  color: var(--team);
+  border-bottom-color: var(--team);
+}
+/* 예매 링크가 아직 없는 예매처 — 누를 수 없으니 밑줄도 두지 않는다 */
+.vendor-dir-plain {
+  color: var(--mu);
+}
+
+/* ============================================================
    팀 선택 모달
    ============================================================ */
 .modal-dim {
