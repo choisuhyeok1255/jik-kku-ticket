@@ -1157,8 +1157,12 @@ button {
   gap: 2px;
   width: 100%;
 }
-/* 좌석은 '남은 자리가 눈에 띄고 팔린 자리는 죽는' 방향이어야 한다.
-   팔린 자리를 채워 칠하면 그쪽이 더 도드라져 정작 눌러야 할 곳을 못 찾는다. */
+/* 좌석 색은 두 테마에서 같은 값을 쓴다 (지정된 색).
+   테마 토큰이 아니므로 여기 한 곳에서만 관리한다. */
+.pr-seat-grid {
+  --seat-open: #592fd1; /* 판매되지 않은 자리 */
+  --seat-taken: #cabff3; /* 판매된 자리 */
+}
 .pr-seat {
   aspect-ratio: 1;
   padding: 0;
@@ -1167,18 +1171,21 @@ button {
   background: none;
   border: 1px solid transparent;
 }
-/* 남은 자리 — 테두리로 존재를 드러낸다 (배경과 3:1) */
 .pr-seat.open {
-  border-color: var(--ln2);
+  background: var(--seat-open);
+  border-color: var(--seat-open);
 }
-/* 팔린 자리 — 배경에 가깝게 눌러 조용히 사라지게 한다 */
 .pr-seat.taken {
-  background: var(--ln);
+  background: var(--seat-taken);
+  border-color: var(--seat-taken);
   cursor: default;
 }
+/* 두 좌석색이 모두 보라 계열이라 팀 색만으로는 내가 고른 자리를 찾기 어렵다.
+   안쪽에 배경색 링을 둘러, 색이 아니라 형태로도 구분되게 한다 */
 .pr-seat.picked {
   background: var(--team);
   border-color: var(--team);
+  box-shadow: inset 0 0 0 2px var(--bg);
 }
 
 /* ---------- 결과 ---------- */
