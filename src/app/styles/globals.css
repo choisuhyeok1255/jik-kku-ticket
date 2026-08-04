@@ -828,12 +828,12 @@ button {
   flex-shrink: 0;
 }
 /* 라벨 아래 붙는 단위 설명. 선택지 쪽이 아니라 여기 두어야 오른쪽 목록이
-   세 줄 그대로 유지된다 */
+   세 줄 그대로 유지된다. 작은 글자라 --ln2(3:1, 선·점용)가 아니라 --mu를 쓴다 */
 .pr-row-label small {
   display: block;
   font-size: 11px;
   letter-spacing: 0.02em;
-  color: var(--ln2);
+  color: var(--mu);
   margin-top: 1px;
 }
 .pr-row-opts {
