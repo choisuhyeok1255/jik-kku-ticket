@@ -32,24 +32,9 @@ export const SELLOUT_INTERVAL_MS = 400;
  * 견주면 시간이 8배 남았다. 실패가 사실상 불가능해 지금 값으로 줄였다.
  */
 export const DIFFICULTIES = {
-  easy: {
-    label: "쉬움",
-    durationMs: 25000,
-    preTakenRate: 0.1,
-    hint: "여유 있게 익히기",
-  },
-  normal: {
-    label: "보통",
-    durationMs: 15000,
-    preTakenRate: 0.25,
-    hint: "실전과 비슷하게",
-  },
-  hard: {
-    label: "어려움",
-    durationMs: 8000,
-    preTakenRate: 0.4,
-    hint: "인기 경기처럼",
-  },
+  easy: { label: "쉬움", durationMs: 25000, preTakenRate: 0.1 },
+  normal: { label: "보통", durationMs: 15000, preTakenRate: 0.25 },
+  hard: { label: "어려움", durationMs: 8000, preTakenRate: 0.4 },
 } as const;
 
 /**

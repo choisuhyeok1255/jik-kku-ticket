@@ -807,10 +807,42 @@ button {
   font-weight: 600;
 }
 
+/* 연습 시작 설정 — 질문을 왼쪽 라벨 한 단어로 줄이고 선택지를 오른쪽에 나란히 둔다.
+   세 줄이 같은 위치에서 시작해 눈이 좌우로 헤매지 않는다 */
+.pr-setup {
+  width: 100%;
+  border-top: 1px solid var(--ln);
+}
+.pr-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ln);
+}
+.pr-row-label {
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  color: var(--mu);
+  width: 64px;
+  flex-shrink: 0;
+}
+/* 라벨 아래 붙는 단위 설명. 선택지 쪽이 아니라 여기 두어야 오른쪽 목록이
+   세 줄 그대로 유지된다 */
+.pr-row-label small {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ln2);
+  margin-top: 1px;
+}
+.pr-row-opts {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
 /* 선택지 — 칸 없이 밑줄로만 표시해 단계가 짧아 보이게 한다 */
-.pr-count-group,
-.pr-level-group,
-.pr-vendor-grid,
 .pr-zone-grid {
   display: flex;
   justify-content: center;
@@ -820,14 +852,13 @@ button {
 }
 .pr-count,
 .pr-level,
-.pr-vendor-card,
 .pr-zone-card {
   background: none;
   border: 0;
-  border-bottom: 1px solid transparent;
-  padding: 0 0 5px;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 4px;
   color: var(--mu);
-  font-size: 15px;
+  font-size: 16px;
   text-align: center;
   transition:
     color 0.12s ease,
@@ -835,7 +866,6 @@ button {
 }
 .pr-count:hover,
 .pr-level:hover,
-.pr-vendor-card:hover,
 .pr-zone-card:hover {
   color: var(--fg);
 }
@@ -845,70 +875,77 @@ button {
   font-weight: 600;
   border-bottom-color: var(--team);
 }
-
-.pr-level {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.pr-level b {
-  font-size: 15px;
-  font-weight: inherit;
-}
-.pr-level span,
+/* 난이도에 붙는 시간. 이름보다 한 단계 낮춰 이름이 먼저 읽히게 한다 */
 .pr-level small {
+  margin-left: 5px;
   font-size: 12px;
+  font-weight: 400;
   color: var(--mu);
-  letter-spacing: 0.02em;
-}
-.pr-level.on span {
-  color: var(--fg);
+  font-variant-numeric: tabular-nums;
 }
 
-/* 예매처·구역은 설명이 붙으므로 세로로 편다 */
-.pr-vendor-grid,
+/* 고른 예매처의 진입 방식 설명. 이것만은 지우지 않는다 —
+   두 예매처가 어떻게 다른지 모르고 시작하면 연습이 되지 않는다 */
+.pr-vendor-note {
+  margin: 0;
+  width: 100%;
+  font-size: 13px;
+  color: var(--mu);
+  line-height: 1.6;
+  /* 두 줄 자리를 늘 잡아둬, 예매처를 바꿀 때 아래 버튼이 위아래로 흔들리지 않게 한다 */
+  min-height: 3.2em;
+}
+.pr-vendor-note b {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.pr-start {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid var(--team);
+  padding: 0 2px 5px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--fg);
+  transition: color 0.12s ease;
+}
+.pr-start:hover {
+  color: var(--team);
+}
+
+/* 구역은 남은 좌석 수가 붙으므로 세로로 편다 */
 .pr-zone-grid {
   flex-direction: column;
   align-items: stretch;
   gap: 0;
   border-top: 1px solid var(--ln);
 }
-.pr-vendor-card,
 .pr-zone-card {
   border-bottom: 1px solid var(--ln);
+  border-bottom-color: var(--ln);
   padding: 16px 2px;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
   text-align: left;
 }
-.pr-vendor-card:hover,
 .pr-zone-card:hover {
   border-bottom-color: var(--team);
 }
-.pr-vendor-name,
 .pr-zone-name {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--fg);
 }
-.pr-vendor-point {
-  font-size: 12.5px;
-  letter-spacing: 0.06em;
-  color: var(--mu);
-}
-.pr-vendor-detail,
 .pr-zone-desc {
   font-size: 13px;
   color: var(--mu);
   line-height: 1.55;
-}
-.pr-zone-card {
-  flex-direction: row;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
 }
 .pr-zone-left {
   font-size: 12.5px;
