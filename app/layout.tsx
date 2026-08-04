@@ -77,21 +77,23 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/** 검색엔진용 구조화 데이터(JSON-LD). 이 앱을 무료 웹 애플리케이션으로 기술한다. */
+/**
+ * 검색엔진용 구조화 데이터(JSON-LD) — 사이트 자체를 기술한다.
+ *
+ * 이 파일은 모든 페이지에 함께 실리므로, 특정 페이지의 도구가 아니라 **사이트**만 말한다.
+ * 각 페이지가 제공하는 도구(서버시계·연습)는 그 페이지가 자기 노드로 따로 기술하고,
+ * 여기 붙인 @id를 `isPartOf`로 가리켜 "그 사이트의 일부"임을 밝힌다.
+ * 이렇게 나누지 않으면 연습 페이지 문서에도 사이트 전체를 설명하는 앱 노드가 같이 실려
+ * 검색엔진이 그 페이지의 주제를 판단하기 어려워진다.
+ */
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}#website`,
   name: SITE_NAME,
   url: SITE_URL,
   description: SITE_DESCRIPTION,
-  applicationCategory: "SportsApplication",
-  operatingSystem: "Web",
   inLanguage: "ko-KR",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "KRW",
-  },
 };
 
 export default function RootLayout({
