@@ -16,22 +16,43 @@ import { PracticeDifficulty, PracticeSession } from "./types";
 export function usePracticeRun() {
   const [session, setSession] = useState<PracticeSession | null>(null);
   /**
-   * 이 판이 이미 끝났는지. 승부가 갈리는 순간에 성공과 실패가 겹치는 것을 막는다.
+   * 지금 판의 상태를 렌더와 무관하게 들고 있는 사본.
    *
-   * 판을 끝내는 두 길(좌석 잡기 / 매진)은 서로 다른 흐름에서 온다 —
-   * 매진은 화면을 그린 뒤 도는 effect가 알리고, 좌석 잡기는 사용자의 클릭이 알린다.
-   * 그래서 매진이 감지된 직후, 그 결과가 화면에 반영되기 전에 마지막 클릭이 들어올 수 있다.
-   * phase만 보고 판단하면 그 클릭이 낡은 값(아직 '좌석 선택')을 읽어 실패한 판을
-   * 성공으로 덮고 최고 기록까지 남긴다.
+   * 판을 바꾸는 요청은 서로 다른 흐름에서 온다 — 매진은 화면을 그린 뒤 도는 effect가,
+   * 좌석 잡기와 그만두기는 사용자의 클릭이 알린다. 화면에 그려진 값만 보고 판단하면
+   * 그 사이에 이미 갈린 승부를 못 보고 덮어쓴다 (실패한 판이 성공으로 기록되는 식).
    *
-   * ref는 렌더를 기다리지 않고 즉시 바뀌므로, 먼저 도착한 쪽이 확실하게 이긴다.
+   * ref는 렌더를 기다리지 않고 즉시 바뀌므로, 이걸 유일한 기준으로 삼으면
+   * 먼저 도착한 요청이 확실하게 이긴다.
    */
-  const isFinished = useRef(false);
-  const phase = session?.phase;
+  const current = useRef<PracticeSession | null>(null);
+
+  /** 판을 통째로 갈아끼운다. 사본과 화면이 늘 같은 값을 보게 이 함수로만 바꾼다 */
+  const replaceSession = (next: PracticeSession | null) => {
+    current.current = next;
+    setSession(next);
+  };
+
+  /**
+   * 지금이 그 단계일 때만 판을 갱신한다. (단계를 넘기는 것도, 제자리에서 값만 바꾸는 것도)
+   *
+   * @param inPhase 이 단계일 때만 갱신한다. 아니면 아무 일도 하지 않고 null을 준다
+   * @returns 갱신된 판. 갱신하지 못했으면 null
+   */
+  const updateInPhase = (
+    inPhase: PracticeSession["phase"],
+    toNext: (prev: PracticeSession) => PracticeSession
+  ): PracticeSession | null => {
+    const prev = current.current;
+    if (!prev || prev.phase !== inPhase) return null;
+
+    const next = toNext(prev);
+    replaceSession(next);
+    return next;
+  };
 
   const start = (ticketCount: number, difficulty: PracticeDifficulty) => {
-    isFinished.current = false;
-    setSession({
+    replaceSession({
       phase: "zone",
       marks: { startedAt: Date.now() },
       ticketCount,
@@ -41,77 +62,56 @@ export function usePracticeRun() {
   };
 
   const pickZone = (zoneId: ZoneKind) => {
-    setSession((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        phase: "captcha",
-        zoneId,
-        marks: { ...prev.marks, zonePickedAt: Date.now() },
-      };
-    });
+    updateInPhase("zone", (prev) => ({
+      ...prev,
+      phase: "captcha",
+      zoneId,
+      marks: { ...prev.marks, zonePickedAt: Date.now() },
+    }));
   };
 
   // 보안문자를 통과해야 좌석 배치도가 열린다
   const passCaptcha = () => {
-    setSession((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        phase: "seat",
-        marks: { ...prev.marks, captchaPassedAt: Date.now() },
-      };
-    });
+    updateInPhase("captcha", (prev) => ({
+      ...prev,
+      phase: "seat",
+      marks: { ...prev.marks, captchaPassedAt: Date.now() },
+    }));
   };
 
   /**
    * 좌석을 잡으면 예매 완료.
    * 완료 시각을 함께 돌려준다 — 호출자가 기록을 남길 때 시각을 다시 재면
    * 화면에 보이는 소요 시간과 저장되는 기록이 미세하게 어긋나기 때문이다.
-   * 이미 끝난 판이면 null을 주어, 호출자가 기록을 남기지 않게 한다.
+   * 완료로 넘어가지 못했으면(이미 끝났거나 그만둔 판) null을 주어 기록을 남기지 않게 한다.
    */
   const pickSeat = (): number | null => {
-    // 좌석 화면에서 온 것만 완료로 친다 — 앞 단계에서 넘어오면 거쳐온 시각이 비어
-    // 구간별 소요 시간을 낼 수 없고, 결과 화면이 영영 뜨지 않는다
-    if (phase !== "seat" || isFinished.current) return null;
-    isFinished.current = true;
-
     const finishedAt = Date.now();
-    setSession((prev) => {
-      if (!prev) return prev;
-      return { ...prev, phase: "done", marks: { ...prev.marks, finishedAt } };
-    });
-    return finishedAt;
+    const next = updateInPhase("seat", (prev) => ({
+      ...prev,
+      phase: "done",
+      marks: { ...prev.marks, finishedAt },
+    }));
+    return next ? finishedAt : null;
   };
 
   // 고를 자리가 다 나가 원하는 매수를 채울 수 없게 됐다 — 예매 실패
   const failSoldOut = () => {
-    // 성공 쪽과 같은 조건으로 막는다. 한쪽만 느슨하면 진행 중이 아닌 판에 '끝남' 표시만
-    // 남아, 뒤이은 좌석 잡기가 통째로 무시된다
-    if (phase !== "seat" || isFinished.current) return;
-    isFinished.current = true;
-
-    setSession((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        phase: "soldout",
-        marks: { ...prev.marks, finishedAt: Date.now() },
-      };
-    });
+    updateInPhase("seat", (prev) => ({
+      ...prev,
+      phase: "soldout",
+      marks: { ...prev.marks, finishedAt: Date.now() },
+    }));
   };
 
   const addMissClick = () => {
-    setSession((prev) => {
-      if (!prev) return prev;
-      return { ...prev, missClicks: prev.missClicks + 1 };
-    });
+    updateInPhase("seat", (prev) => ({
+      ...prev,
+      missClicks: prev.missClicks + 1,
+    }));
   };
 
-  const reset = () => {
-    isFinished.current = false;
-    setSession(null);
-  };
+  const reset = () => replaceSession(null);
 
   return {
     session,
