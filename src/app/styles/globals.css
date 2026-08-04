@@ -793,9 +793,6 @@ button {
   letter-spacing: -0.02em;
   margin: 0;
 }
-.pr-title-gap {
-  margin-top: 12px;
-}
 .pr-sub {
   font-size: 13px;
   color: var(--mu);
@@ -803,19 +800,9 @@ button {
   margin: 0;
   max-width: 34ch;
 }
-.pr-mission {
-  font-size: 13px;
-  color: var(--mu);
-  margin: 0;
-  letter-spacing: 0.06em;
-}
-.pr-mission b {
-  color: var(--fg);
-  font-weight: 600;
-}
 
 /* 연습 시작 설정 — 질문을 왼쪽 라벨 한 단어로 줄이고 선택지를 오른쪽에 나란히 둔다.
-   세 줄이 같은 위치에서 시작해 눈이 좌우로 헤매지 않는다 */
+   두 줄이 같은 위치에서 시작해 눈이 좌우로 헤매지 않는다 */
 .pr-setup {
   width: 100%;
   border-top: 1px solid var(--ln);
@@ -891,22 +878,6 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
-/* 고른 예매처의 진입 방식 설명. 이것만은 지우지 않는다 —
-   두 예매처가 어떻게 다른지 모르고 시작하면 연습이 되지 않는다 */
-.pr-vendor-note {
-  margin: 0;
-  width: 100%;
-  font-size: 13px;
-  color: var(--mu);
-  line-height: 1.6;
-  /* 두 줄 자리를 늘 잡아둬, 예매처를 바꿀 때 아래 버튼이 위아래로 흔들리지 않게 한다 */
-  min-height: 3.2em;
-}
-.pr-vendor-note b {
-  color: var(--fg);
-  font-weight: 600;
-}
-
 .pr-start {
   background: none;
   border: 0;
@@ -959,90 +930,6 @@ button {
   color: var(--mu);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-/* ---------- 오픈 대기 — 컨셉 그 자체 ---------- */
-.pr-countdown {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-  padding: 16px 0 6px;
-}
-/* 시계와 같은 이유로 칸 폭을 고정한다. 0.00~9.99가 들어가므로 네 글자 몫을 잡는다.
-   안 잡으면 매 프레임 숫자가 바뀌며 옆의 "초 뒤 열립니다"까지 같이 흔들린다 */
-.pr-countdown-value {
-  font-size: clamp(58px, 16vw, 84px);
-  font-weight: 200;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  font-variant-numeric: tabular-nums;
-  min-width: 2.3em;
-  text-align: center;
-}
-.pr-countdown-unit {
-  font-size: 15px;
-  color: var(--mu);
-  letter-spacing: 0.06em;
-}
-/* 열린 순간에만 팀 색으로 바뀐다 — 큰 글자라 3:1이면 충분하다 */
-.pr-countdown-open {
-  font-size: clamp(40px, 11vw, 60px);
-  font-weight: 200;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--team);
-}
-.pr-enter {
-  background: none;
-  border: 0;
-  border-bottom: 1px solid var(--ln);
-  padding: 0 2px 5px;
-  font-size: 14px;
-  letter-spacing: 0.1em;
-  color: var(--mu);
-  cursor: default;
-}
-.pr-enter.on {
-  color: var(--fg);
-  font-weight: 600;
-  border-bottom: 2px solid var(--team);
-  cursor: pointer;
-}
-.pr-enter.on:hover {
-  color: var(--team);
-}
-.pr-hint {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  max-width: 34ch;
-}
-.pr-hint p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--mu);
-  line-height: 1.65;
-}
-.pr-hint b {
-  color: var(--fg);
-  font-weight: 600;
-}
-.pr-hint p.pr-hint-key {
-  font-size: 12.5px;
-  letter-spacing: 0.06em;
-}
-.pr-hint kbd {
-  font-family: inherit;
-  font-size: 12.5px;
-  border: 1px solid var(--ln2);
-  padding: 1px 5px;
-  color: var(--fg);
-}
-.pr-hint p.pr-hint-now {
-  color: var(--team);
-  font-weight: 600;
-  letter-spacing: 0.08em;
 }
 
 /* ---------- 보안문자 ----------

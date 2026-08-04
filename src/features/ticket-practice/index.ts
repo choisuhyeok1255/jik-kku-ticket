@@ -1,6 +1,5 @@
 // 티켓팅 연습 기능 public API
-export { default as VendorPicker } from "./ui/VendorPicker";
-export { default as WaitingRoom } from "./ui/WaitingRoom";
+export { default as PracticeSetup } from "./ui/PracticeSetup";
 export { default as ZonePicker } from "./ui/ZonePicker";
 export { default as SeatBoard } from "./ui/SeatBoard";
 export { default as CaptchaInput } from "./ui/CaptchaInput";

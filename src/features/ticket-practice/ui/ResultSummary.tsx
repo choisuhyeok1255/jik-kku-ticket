@@ -1,6 +1,6 @@
 "use client";
 
-import { PracticeResult, PracticeVendor } from "../model/types";
+import { PracticeResult } from "../model/types";
 
 /**
  * 연습 결과 화면.
@@ -8,7 +8,6 @@ import { PracticeResult, PracticeVendor } from "../model/types";
  */
 
 interface Props {
-  vendor: PracticeVendor;
   result: PracticeResult;
   /** 이번 판에 잡은 표 수 */
   ticketCount: number;
@@ -21,7 +20,6 @@ interface Props {
 const toSeconds = (ms: number) => `${(ms / 1000).toFixed(2)}초`;
 
 export default function ResultSummary({
-  vendor,
   result,
   ticketCount,
   bestMs,
@@ -29,10 +27,6 @@ export default function ResultSummary({
   onRetry,
 }: Props) {
   const steps = [
-    {
-      label: vendor === "ticketlink" ? "새로고침 → 진입" : "오픈 → 진입",
-      value: result.enter,
-    },
     { label: "구역 선택", value: result.zone },
     { label: "보안문자", value: result.captcha },
     { label: "좌석 잡기", value: result.seat },

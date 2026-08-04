@@ -8,21 +8,17 @@ import { PracticeMarks, PracticeResult } from "../model/types";
 /** 모든 단계를 통과해 구간 시간을 계산할 수 있는 시각 묶음 */
 type CompletedMarks = PracticeMarks &
   Required<
-    Pick<
-      PracticeMarks,
-      "enteredAt" | "zonePickedAt" | "captchaPassedAt" | "finishedAt"
-    >
+    Pick<PracticeMarks, "zonePickedAt" | "captchaPassedAt" | "finishedAt">
   >;
 
 /**
  * 구간별 시간을 전부 계산할 수 있을 만큼 시각이 찍혔는가.
  *
- * 결과 화면을 그릴 수 있는지 판단하는 기준이라, 저장된 연습을 복원할 때도 같은 기준을 쓴다.
- * (기준이 갈리면 '완료'로 저장됐는데 결과는 못 그리는 상태가 생긴다)
+ * 결과 화면을 그릴 수 있는지 판단하는 기준이다.
  */
 export function hasAllMarks(marks: PracticeMarks): marks is CompletedMarks {
-  const { enteredAt, zonePickedAt, captchaPassedAt, finishedAt } = marks;
-  return Boolean(enteredAt && zonePickedAt && captchaPassedAt && finishedAt);
+  const { zonePickedAt, captchaPassedAt, finishedAt } = marks;
+  return Boolean(zonePickedAt && captchaPassedAt && finishedAt);
 }
 
 /**
@@ -38,14 +34,12 @@ export function calcResult(
 ): PracticeResult | null {
   if (!hasAllMarks(marks)) return null;
 
-  const { openAt, enteredAt, zonePickedAt, captchaPassedAt, finishedAt } =
-    marks;
+  const { startedAt, zonePickedAt, captchaPassedAt, finishedAt } = marks;
   return {
-    enter: enteredAt - openAt,
-    zone: zonePickedAt - enteredAt,
+    zone: zonePickedAt - startedAt,
     captcha: captchaPassedAt - zonePickedAt,
     seat: finishedAt - captchaPassedAt,
-    total: finishedAt - openAt,
+    total: finishedAt - startedAt,
     missClicks,
   };
 }

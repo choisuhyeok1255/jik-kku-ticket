@@ -8,58 +8,25 @@ import {
   DIFFICULTY_KEYS,
   TICKET_COUNT_OPTIONS,
 } from "../config/practice";
-import {
-  PRACTICE_VENDORS,
-  PracticeDifficulty,
-  PracticeVendor,
-} from "../model/types";
+import { PracticeDifficulty } from "../model/types";
 
 /**
  * 연습 시작 화면.
  *
- * 몇 장을 예매할지, 좌석이 얼마나 빨리 나갈지, 어디에서 예매할지를 정하고 시작한다.
+ * 몇 장을 예매할지, 좌석이 얼마나 빨리 나갈지를 정하고 시작한다.
  *
- * 질문을 왼쪽 라벨 한 단어로 줄이고 선택지를 그 오른쪽에 나란히 둔다. 세 줄이 같은
+ * 질문을 왼쪽 라벨 한 단어로 줄이고 선택지를 그 오른쪽에 나란히 둔다. 두 줄이 같은
  * 위치에서 시작해, 무엇을 고르는 화면인지 한눈에 잡힌다.
- *
- * 예매처 설명만은 지우지 않고 **고른 것 하나만** 아래에 보여준다 — 두 예매처의
- * 예매창 진입 방식이 다른 것이 이 연습의 핵심이라, 모르고 시작하면 연습이 되지 않는다.
  */
 
 interface Props {
-  onStart: (
-    vendor: PracticeVendor,
-    ticketCount: number,
-    difficulty: PracticeDifficulty
-  ) => void;
+  onStart: (ticketCount: number, difficulty: PracticeDifficulty) => void;
 }
 
-const VENDOR_LABEL: Record<PracticeVendor, string> = {
-  ticketlink: "티켓링크",
-  nol: "NOL 티켓",
-};
-
-/** 예매창에 들어가는 방식의 차이. 고른 예매처 것만 화면에 남는다 */
-const VENDOR_NOTE: Record<PracticeVendor, React.ReactNode> = {
-  ticketlink: (
-    <>
-      티켓링크는 시간이 돼도 버튼이 저절로 열리지 않아요. 오픈 시각에 맞춰{" "}
-      <b>새로고침</b>해야 합니다.
-    </>
-  ),
-  nol: (
-    <>
-      NOL은 오픈 시각이 되면 버튼이 <b>저절로 열려요</b>. 살아나는 순간 바로
-      누르세요.
-    </>
-  ),
-};
-
-export default function VendorPicker({ onStart }: Props) {
+export default function PracticeSetup({ onStart }: Props) {
   const [ticketCount, setTicketCount] = useState(DEFAULT_TICKET_COUNT);
   const [difficulty, setDifficulty] =
     useState<PracticeDifficulty>(DEFAULT_DIFFICULTY);
-  const [vendor, setVendor] = useState<PracticeVendor>(PRACTICE_VENDORS[0]);
 
   return (
     <section className="pr-card">
@@ -103,32 +70,12 @@ export default function VendorPicker({ onStart }: Props) {
             ))}
           </div>
         </div>
-
-        <div className="pr-row" role="group" aria-label="예매처">
-          <span className="pr-row-label">예매처</span>
-          <div className="pr-row-opts">
-            {PRACTICE_VENDORS.map((key) => (
-              <button
-                key={key}
-                type="button"
-                className={`pr-level ${key === vendor ? "on" : ""}`}
-                onClick={() => setVendor(key)}
-                aria-pressed={key === vendor}
-              >
-                {VENDOR_LABEL[key]}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
-
-      {/* 자리를 늘 차지하게 두면 예매처를 바꿀 때 아래 버튼이 위아래로 흔들리지 않는다 */}
-      <p className="pr-vendor-note">{VENDOR_NOTE[vendor]}</p>
 
       <button
         type="button"
         className="pr-start"
-        onClick={() => onStart(vendor, ticketCount, difficulty)}
+        onClick={() => onStart(ticketCount, difficulty)}
       >
         연습 시작
       </button>
