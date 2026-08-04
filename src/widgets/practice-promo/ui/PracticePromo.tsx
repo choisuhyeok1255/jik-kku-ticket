@@ -10,7 +10,7 @@ export default function PracticePromo() {
   return (
     <div className="app-promo">
       <div className="promo-text">
-        <p className="promo-title">예매 전에 손부터 풀기</p>
+        <p className="promo-title">포도알 연습</p>
         <p className="promo-sub">
           오픈 대기 · 보안문자 · 포도알 잡기까지 실제 절차 그대로
         </p>
