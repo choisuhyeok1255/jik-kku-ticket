@@ -208,6 +208,13 @@ button {
 .promo-inline .promo-sub {
   display: none; /* 첫 화면에서는 제목과 링크만 남긴다 */
 }
+/* 연습 페이지는 본문 맨 아래에 둔다. 위쪽은 연습이 쓰는 자리라
+   메인처럼 끌어올리면 좌석판을 밀어낸다 */
+.promo-tail {
+  margin-top: auto;
+  padding-top: 20px;
+  margin-bottom: 0;
+}
 
 .loading-line {
   color: var(--mu);

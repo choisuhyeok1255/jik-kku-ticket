@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { TEAMS, useMyTeam, teamColorVars } from "@/entities/team";
 import { SiteHeader } from "@/widgets/site-header";
+import { AppPromo } from "@/widgets/app-promo";
 import {
   CaptchaInput,
   ResultSummary,
@@ -74,80 +75,95 @@ export default function PracticePage() {
 
   return (
     /* 메인과 같은 응원팀 색을 쓴다 — 두 화면을 오가도 같은 서비스로 읽히게 */
-    <main
-      className="wrap themed"
+    <div
+      className="page-layout themed"
       style={teamColorVars(team ? TEAMS[team] : undefined)}
     >
-      <SiteHeader />
+      <main className="wrap">
+        <SiteHeader />
 
-      {/* 홈으로 가는 길은 헤더의 브랜드 하나로 모았다.
+        {/* 홈으로 가는 길은 헤더의 브랜드 하나로 모았다.
           아래 '연습 그만두기'는 이 판을 처음으로 되돌릴 뿐 페이지를 벗어나지 않는다 */}
-      <div className="pr-intro">
-        <h1 className="pr-heading">포도알 연습</h1>
-        <p className="pr-lead">
-          예매 오픈부터 좌석 잡기까지, 실제 절차 그대로 연습해요.
-        </p>
-      </div>
+        <div className="pr-intro">
+          <h1 className="pr-heading">포도알 연습</h1>
+          <p className="pr-lead">
+            예매 오픈부터 좌석 잡기까지, 실제 절차 그대로 연습해요.
+          </p>
+        </div>
 
-      {/* 이전 연습을 이어받을지 확인하는 동안에는 화면 골격만 유지한다 (헤더가 늦게 끼어들지 않도록) */}
-      {!loaded && <p className="loading-line">불러오는 중…</p>}
+        {/* 이전 연습을 이어받을지 확인하는 동안에는 화면 골격만 유지한다 (헤더가 늦게 끼어들지 않도록) */}
+        {!loaded && <p className="loading-line">불러오는 중…</p>}
 
-      {loaded && !session && <VendorPicker onStart={start} />}
+        {loaded && !session && <VendorPicker onStart={start} />}
 
-      {session?.phase === "waiting" && (
-        <WaitingRoom
-          vendor={session.vendor}
-          openAt={session.marks.openAt}
-          pageLoadedAt={pageLoadedAt}
-          ticketCount={session.ticketCount}
-          difficulty={session.difficulty}
-          onEnter={enter}
-        />
-      )}
+        {session?.phase === "waiting" && (
+          <WaitingRoom
+            vendor={session.vendor}
+            openAt={session.marks.openAt}
+            pageLoadedAt={pageLoadedAt}
+            ticketCount={session.ticketCount}
+            difficulty={session.difficulty}
+            onEnter={enter}
+          />
+        )}
 
-      {session?.phase === "zone" && <ZonePicker onPickZone={pickZone} />}
+        {session?.phase === "zone" && <ZonePicker onPickZone={pickZone} />}
 
-      {session?.phase === "captcha" && <CaptchaInput onSolved={passCaptcha} />}
+        {session?.phase === "captcha" && (
+          <CaptchaInput onSolved={passCaptcha} />
+        )}
 
-      {session?.phase === "seat" && session.zoneId && (
-        <SeatBoard
-          key={session.zoneId} // 구역이 바뀌면 좌석 배치를 새로 만든다
-          zoneId={session.zoneId}
-          ticketCount={session.ticketCount}
-          difficulty={session.difficulty}
-          onComplete={handleSeatsComplete}
-          onMissClick={handleMissClick}
-          onSoldOut={failSoldOut}
-        />
-      )}
+        {session?.phase === "seat" && session.zoneId && (
+          <SeatBoard
+            key={session.zoneId} // 구역이 바뀌면 좌석 배치를 새로 만든다
+            zoneId={session.zoneId}
+            ticketCount={session.ticketCount}
+            difficulty={session.difficulty}
+            onComplete={handleSeatsComplete}
+            onMissClick={handleMissClick}
+            onSoldOut={failSoldOut}
+          />
+        )}
 
-      {showsResult && (
-        <ResultSummary
-          vendor={session.vendor}
-          result={result}
-          ticketCount={session.ticketCount}
-          bestMs={getBest(session.vendor, session.difficulty)}
-          isNewBest={isNewBest}
-          onRetry={handleRetry}
-        />
-      )}
+        {showsResult && (
+          <ResultSummary
+            vendor={session.vendor}
+            result={result}
+            ticketCount={session.ticketCount}
+            bestMs={getBest(session.vendor, session.difficulty)}
+            isNewBest={isNewBest}
+            onRetry={handleRetry}
+          />
+        )}
 
-      {session?.phase === "soldout" && (
-        <SoldOutSummary
-          ticketCount={session.ticketCount}
-          elapsedMs={(session.marks.finishedAt ?? 0) - session.marks.openAt}
-          missClicks={session.missClicks}
-          onRetry={handleRetry}
-        />
-      )}
+        {session?.phase === "soldout" && (
+          <SoldOutSummary
+            ticketCount={session.ticketCount}
+            elapsedMs={(session.marks.finishedAt ?? 0) - session.marks.openAt}
+            missClicks={session.missClicks}
+            onRetry={handleRetry}
+          />
+        )}
 
-      {/* 결과 화면에는 '다시 연습하기'가 있으니 그때만 감춘다.
+        {/* 결과 화면에는 '다시 연습하기'가 있으니 그때만 감춘다.
           끝난 상태인데 결과를 못 그리는 경우에도 빠져나갈 길은 남겨둔다 */}
-      {session && !showsSummary && (
-        <button type="button" className="pr-quit" onClick={handleRetry}>
-          연습 그만두기
-        </button>
-      )}
-    </main>
+        {session && !showsSummary && (
+          <button type="button" className="pr-quit" onClick={handleRetry}>
+            연습 그만두기
+          </button>
+        )}
+
+        {/* 좁은 화면에서는 본문 맨 아래에 둔다. 메인처럼 위에 올리면 좌석을 다급히
+            누르는 동안 화면을 차지하고, 급한 손이 외부 링크를 눌러 연습을 벗어날 수 있다 */}
+        <div className="promo-inline promo-tail">
+          <AppPromo />
+        </div>
+      </main>
+
+      {/* 데스크탑: 본문 옆 사이드라 연습을 가리지 않는다 */}
+      <aside className="promo-aside">
+        <AppPromo />
+      </aside>
+    </div>
   );
 }
