@@ -21,6 +21,7 @@ import { PracticeDifficulty } from "../model/types";
  * 좌석표를 보는 동안에도 남들이 계속 자리를 채가는데, **내 화면은 그대로다.**
  * 빈자리로 보여서 눌렀는데 그제서야 이미 나간 자리임을 알게 되는 것 —
  * 그 함정이 티켓팅에서 시간을 가장 많이 잡아먹는 지점이라 그대로 재현한다.
+ * 알림을 닫으면 좌석표가 그 시점으로 갱신되지만, 시간이 흐르며 다시 어긋난다.
  * 꾸물거리면 결국 남는 자리가 없어져 예매에 실패한다.
  *
  * 좌석 배치는 마운트할 때 한 번만 만든다. 무작위라 서버 렌더 결과와 어긋날 수 있으나,
@@ -98,10 +99,18 @@ export default function SeatBoard({
     if (isSoldOut) onSoldOut();
   }, [isSoldOut, onSoldOut]);
 
-  /** 남이 먼저 잡아간 자리였음을 이제야 화면에 반영한다 */
-  const revealTaken = (seatId: string) => {
+  /**
+   * 좌석표를 지금 시점으로 맞춘다.
+   *
+   * 실제 예매창도 "이미 선점된 좌석입니다" 알림을 닫으면 좌석표가 그 시점 기준으로
+   * 새로 그려진다. 누른 자리 하나만 회색으로 바꾸면, 그 사이 남들이 채간 자리는 여전히
+   * 빈자리로 보여 같은 헛클릭을 반복하게 된다.
+   *
+   * 갱신 뒤에도 시간은 계속 흐르므로 화면은 곧 다시 어긋난다.
+   */
+  const syncSoldSeats = () => {
     setSeats((prev) =>
-      prev.map((s) => (s.id === seatId ? { ...s, taken: true } : s))
+      prev.map((s) => (s.reserved ? { ...s, taken: true } : s))
     );
   };
 
@@ -111,7 +120,7 @@ export default function SeatBoard({
       return;
     }
     if (seat.reserved) {
-      revealTaken(seat.id);
+      syncSoldSeats();
       onMissClick();
       return;
     }
