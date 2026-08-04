@@ -12,7 +12,7 @@ export default function PracticePromo() {
       <div className="promo-text">
         <p className="promo-title">포도알 연습</p>
         <p className="promo-sub">
-          오픈 대기 · 보안문자 · 포도알 잡기까지 실제 절차 그대로
+          구역 선택 · 보안문자 · 포도알 잡기까지 실제 절차 그대로
         </p>
       </div>
       <div className="promo-btns">
