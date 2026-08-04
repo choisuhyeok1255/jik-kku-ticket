@@ -1043,6 +1043,13 @@ button {
   grid-template-columns: repeat(var(--cols), 1fr);
   gap: 2px;
   width: 100%;
+  /* 포도알 한 칸을 11px로 제한한다.
+     칸 크기를 직접 고정하면 열이 많은 구역(외야 32열)이 좁은 화면을 넘쳐
+     페이지에 가로 스크롤이 생기므로, 격자 전체의 최대 폭으로 대신 막는다.
+     width와 max-width 중 작은 쪽이 이기므로 —
+     넓은 화면에서는 max-width에 걸려 정확히 11px,
+     좁은 화면에서는 width가 이겨 11px보다 작아지며 넘치지 않는다. */
+  max-width: calc(var(--cols) * 11px + (var(--cols) - 1) * 2px);
 }
 /* 좌석 색은 두 테마에서 같은 값을 쓴다 (지정된 색).
    테마 토큰이 아니므로 여기 한 곳에서만 관리한다. */
