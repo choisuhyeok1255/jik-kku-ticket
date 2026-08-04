@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { TEAMS, TEAM_DB_ID_BY_KEY, TEAM_KEY_BY_DB_ID } from "@/entities/team";
-import { VENDORS } from "@/entities/vendor";
 import { GameRecordRow, useTeamGameRecordsInMonth } from "@/entities/game";
+import { getTeamVendorLinks } from "@/features/pick-vendor";
 import { VendorKey } from "@/shared/config/vendor-keys";
 
 /**
@@ -161,47 +161,47 @@ export default function TeamCalendar({
               <span className="cal-opp-big">{opponent.short}</span>
               {!isPast && (
                 <div className="cal-books">
-                  {homeTeam.vendors.map((tv) => {
-                    const vendor = VENDORS[tv.key];
+                  {getTeamVendorLinks(homeTeam).map(
+                    ({ vendor, bookingUrl, canSwitchClock }) => {
+                      // 예매 링크가 있으면: 예매 사이트 이동(새 탭) + 시계 전환
+                      if (bookingUrl) {
+                        return (
+                          <a
+                            key={vendor.key}
+                            className="cal-book-link"
+                            href={bookingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={
+                              canSwitchClock
+                                ? `${homeTeam.name} · ${vendor.name} 예매 (시계도 전환)`
+                                : `${homeTeam.name} · ${vendor.name} 예매`
+                            }
+                            onClick={
+                              canSwitchClock
+                                ? () => onPickVendor(vendor.key)
+                                : undefined
+                            }
+                          >
+                            {vendor.shortName}
+                          </a>
+                        );
+                      }
 
-                    // 예매 링크가 있으면: 예매 사이트 이동(새 탭) + 시계 전환
-                    if (tv.bookingUrl) {
+                      // 예매 링크가 아직 없으면: 시계 전환만
                       return (
-                        <a
-                          key={tv.key}
+                        <button
+                          key={vendor.key}
+                          type="button"
                           className="cal-book-link"
-                          href={tv.bookingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title={
-                            vendor.noClock
-                              ? `${homeTeam.name} · ${vendor.name} 예매`
-                              : `${homeTeam.name} · ${vendor.name} 예매 (시계도 전환)`
-                          }
-                          onClick={
-                            vendor.noClock
-                              ? undefined
-                              : () => onPickVendor(tv.key)
-                          }
+                          title={`${vendor.name} 서버시간 보기`}
+                          onClick={() => onPickVendor(vendor.key)}
                         >
                           {vendor.shortName}
-                        </a>
+                        </button>
                       );
                     }
-
-                    // 예매 링크가 아직 없으면: 시계 전환만
-                    return (
-                      <button
-                        key={tv.key}
-                        type="button"
-                        className="cal-book-link"
-                        title={`${vendor.name} 서버시간 보기`}
-                        onClick={() => onPickVendor(tv.key)}
-                      >
-                        {vendor.shortName}
-                      </button>
-                    );
-                  })}
+                  )}
                 </div>
               )}
             </div>
