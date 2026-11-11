@@ -214,6 +214,7 @@ export type Database = {
           away_team_id: number
           away_team_score: number | null
           created_at: string
+          game_type: string
           home_team_id: number
           home_team_score: number | null
           id: number
@@ -226,6 +227,7 @@ export type Database = {
           away_team_id: number
           away_team_score?: number | null
           created_at?: string
+          game_type?: string
           home_team_id: number
           home_team_score?: number | null
           id?: number
@@ -238,6 +240,7 @@ export type Database = {
           away_team_id?: number
           away_team_score?: number | null
           created_at?: string
+          game_type?: string
           home_team_id?: number
           home_team_score?: number | null
           id?: number
@@ -320,6 +323,7 @@ export type Database = {
           created_at: string
           game_id: string | null
           id: string
+          last_urgent_key: string | null
           push_token: string
           status: string
           team_id: number | null
@@ -330,6 +334,7 @@ export type Database = {
           created_at?: string
           game_id?: string | null
           id?: string
+          last_urgent_key?: string | null
           push_token: string
           status?: string
           team_id?: number | null
@@ -340,6 +345,7 @@ export type Database = {
           created_at?: string
           game_id?: string | null
           id?: string
+          last_urgent_key?: string | null
           push_token?: string
           status?: string
           team_id?: number | null
@@ -355,6 +361,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      live_score_channels: {
+        Row: {
+          channel_id: string
+          created_at: string
+          ended_at: string | null
+          environment: string
+          game_key: string
+          last_urgent_key: string | null
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          ended_at?: string | null
+          environment: string
+          game_key: string
+          last_urgent_key?: string | null
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          ended_at?: string | null
+          environment?: string
+          game_key?: string
+          last_urgent_key?: string | null
+        }
+        Relationships: []
       }
       live_score_source_state: {
         Row: {
@@ -382,6 +415,7 @@ export type Database = {
           id: string
           platform: string | null
           provider: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -391,6 +425,7 @@ export type Database = {
           id?: string
           platform?: string | null
           provider?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -400,6 +435,7 @@ export type Database = {
           id?: string
           platform?: string | null
           provider?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -430,21 +466,27 @@ export type Database = {
       }
       push_to_start_tokens: {
         Row: {
+          last_recovery_at: string | null
           last_started_game_id: string | null
+          last_started_via_channel: boolean
           team_id: number | null
           token: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          last_recovery_at?: string | null
           last_started_game_id?: string | null
+          last_started_via_channel?: boolean
           team_id?: number | null
           token: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          last_recovery_at?: string | null
           last_started_game_id?: string | null
+          last_started_via_channel?: boolean
           team_id?: number | null
           token?: string
           updated_at?: string
@@ -460,46 +502,40 @@ export type Database = {
           },
         ]
       }
-      share: {
+      reports: {
         Row: {
-          attendee_user_ids: Json
-          content: string
           created_at: string
-          deadline: string
-          id: number
-          max_attendees: number
-          stadium_id: number
-          title: string
-          user_id: string
+          game_log_id: number
+          id: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          status: string
         }
         Insert: {
-          attendee_user_ids?: Json
-          content: string
           created_at?: string
-          deadline: string
-          id?: number
-          max_attendees: number
-          stadium_id: number
-          title: string
-          user_id: string
+          game_log_id: number
+          id?: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          status?: string
         }
         Update: {
-          attendee_user_ids?: Json
-          content?: string
           created_at?: string
-          deadline?: string
-          id?: number
-          max_attendees?: number
-          stadium_id?: number
-          title?: string
-          user_id?: string
+          game_log_id?: number
+          id?: string
+          reason?: string
+          reported_user_id?: string
+          reporter_id?: string
+          status?: string
         }
         Relationships: [
           {
-            foreignKeyName: "share_stadium_id_fkey"
-            columns: ["stadium_id"]
+            foreignKeyName: "reports_game_log_id_fkey"
+            columns: ["game_log_id"]
             isOneToOne: false
-            referencedRelation: "stadium"
+            referencedRelation: "game_logs"
             referencedColumns: ["id"]
           },
         ]
@@ -563,6 +599,27 @@ export type Database = {
           },
         ]
       }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       user_checklist_entries: {
         Row: {
           created_at: string
@@ -601,6 +658,7 @@ export type Database = {
       users: {
         Row: {
           avatar: string | null
+          character: Json | null
           created_at: string
           id: string
           nickname: string
@@ -608,6 +666,7 @@ export type Database = {
         }
         Insert: {
           avatar?: string | null
+          character?: Json | null
           created_at?: string
           id: string
           nickname: string
@@ -615,6 +674,7 @@ export type Database = {
         }
         Update: {
           avatar?: string | null
+          character?: Json | null
           created_at?: string
           id?: string
           nickname?: string
@@ -632,11 +692,73 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      territory_scored_logs: {
+        Row: {
+          has_photo: boolean | null
+          is_home: boolean | null
+          is_private: boolean | null
+          stadium_id: number | null
+          team_id: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_logs_support_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_logs_user_id_fkey2"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_records_stadium_id_fkey"
+            columns: ["stadium_id"]
+            isOneToOne: false
+            referencedRelation: "stadium"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       generate_random_nickname: { Args: never; Returns: string }
+      get_my_territory_contribution: {
+        Args: never
+        Returns: {
+          away_photo_count: number
+          away_private_count: number
+          away_public_count: number
+          home_photo_count: number
+          home_private_count: number
+          home_public_count: number
+          log_count: number
+          stadium_id: number
+          team_id: number
+        }[]
+      }
+      get_territory_stats: {
+        Args: never
+        Returns: {
+          away_photo_count: number
+          away_private_count: number
+          away_public_count: number
+          home_photo_count: number
+          home_private_count: number
+          home_public_count: number
+          log_count: number
+          stadium_id: number
+          team_id: number
+        }[]
+      }
+      get_user_count: { Args: never; Returns: number }
       promote_checklist_item: { Args: { target_id: string }; Returns: string }
+      territory_season_year: { Args: never; Returns: number }
     }
     Enums: {
       checklist_item_kind: "official" | "unofficial"
@@ -656,12 +778,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -685,11 +807,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -710,11 +832,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -735,11 +857,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -752,11 +874,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
